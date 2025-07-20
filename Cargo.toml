@@ -46,6 +46,9 @@ dirs = "5.0"
 # Process management
 which = "6.0"
 
+# Text processing
+regex = "1.10"
+
 # HTTP server
 axum = "0.7"
 tower = "0.4"

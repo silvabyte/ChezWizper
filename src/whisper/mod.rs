@@ -4,12 +4,15 @@ use std::process::Command;
 use tracing::{debug, info, error, warn};
 use which::which;
 
+use crate::normalizer::Normalizer;
+
 pub struct WhisperTranscriber {
     command_path: PathBuf,
     model: String,
     model_path: Option<String>,
     language: String,
     is_openai_whisper: bool,
+    normalizer: Normalizer,
 }
 
 impl WhisperTranscriber {
@@ -47,12 +50,15 @@ impl WhisperTranscriber {
             info!("Detected whisper.cpp or other implementation");
         }
         
+        let normalizer = Normalizer::create(is_openai)?;
+        
         Ok(Self {
             command_path,
             model: "base".to_string(),
             model_path: None,
             language: "en".to_string(),
             is_openai_whisper: is_openai,
+            normalizer,
         })
     }
     
@@ -116,11 +122,11 @@ impl WhisperTranscriber {
         // Clean up output file
         let _ = std::fs::remove_file(&output_path);
         
-        let transcription = transcription.trim().to_string();
-        info!("Transcription complete: {} chars", transcription.len());
-        debug!("Transcription: {}", transcription);
+        let normalized = self.normalizer.run(&transcription);
+        info!("Transcription complete: {} chars", normalized.len());
+        debug!("Transcription: {}", normalized);
         
-        Ok(transcription)
+        Ok(normalized)
     }
     
     async fn transcribe_whisper_cpp(&self, audio_path: &PathBuf) -> Result<String> {
@@ -168,15 +174,16 @@ impl WhisperTranscriber {
             }
             
             let transcription = String::from_utf8_lossy(&output.stdout);
-            return Ok(transcription.trim().to_string());
+            let normalized = self.normalizer.run(&transcription);
+            return Ok(normalized);
         }
         
         let transcription = String::from_utf8_lossy(&output.stdout);
-        let transcription = transcription.trim().to_string();
+        let normalized = self.normalizer.run(&transcription);
         
-        info!("Transcription complete: {} chars", transcription.len());
-        debug!("Transcription: {}", transcription);
+        info!("Transcription complete: {} chars", normalized.len());
+        debug!("Transcription: {}", normalized);
         
-        Ok(transcription)
+        Ok(normalized)
     }
 }

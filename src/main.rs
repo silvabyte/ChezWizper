@@ -2,6 +2,7 @@ mod api;
 mod audio;
 mod clipboard;
 mod config;
+mod normalizer;
 mod text_injection;
 mod ui;
 mod whisper;
