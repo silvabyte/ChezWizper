@@ -4,7 +4,7 @@ Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcut
 
 ## Features
 
-- 🎤 Global hotkey to toggle recording (Ctrl+Shift+A by default)
+- 🎤 hyprland keybind to toggle recording (Super+R by default)
 - 🔴 Visual indicators for recording status via notifications
 - 🎯 Automatic text injection into focused applications
 - 📋 Clipboard integration with fallback support
@@ -20,12 +20,14 @@ Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcut
 - Audio dependencies: `libasound2-dev` (ALSA)
 - `curl` for API communication
 
-### Install system dependencies on Arch Linux:
+### Install system dependencies on Arch Linux
+
 ```bash
 sudo pacman -S rust wtype wl-clipboard alsa-lib curl
 ```
 
-### Install system dependencies on Ubuntu/Debian:
+### Install system dependencies on Ubuntu/Debian
+
 ```bash
 sudo apt install cargo libasound2-dev wl-clipboard curl
 # Install wtype from source or alternative repositories
@@ -129,30 +131,31 @@ chezwizper
 ### Setup for Hyprland
 
 1. Start ChezWizper:
+
 ```bash
 chezwizper
 ```
 
 2. Add keybind to your Hyprland config (`~/.config/hypr/hyprland.conf`):
+
+If you are using Omachy installation
+
 ```
-bind = CTRL SHIFT, A, exec, curl -X POST http://127.0.0.1:3737/toggle
+bind = SUPER, R, exec, $terminal -e curl -X POST http:/127.0.0.1:3737/toggle
 ```
 
-Or use the provided script:
-```bash
-./chezwizper-keybind.sh
-```
+Or simply
 
-3. Press `Ctrl+Shift+A` to start recording
-4. Speak your text
-5. Press `Ctrl+Shift+A` again to stop recording
-6. Wait for transcription
-7. Text will be automatically inserted at cursor position
+```
+bind = SUPER, R, exec, -e curl -X POST http://127.0.0.1:3737/toggle
+```
 
 ### Manual Control
+
 You can also control ChezWizper manually:
 
 **Toggle recording:**
+
 ```bash
 ./chezwizper-toggle.sh
 # Or directly:
@@ -160,6 +163,7 @@ curl -X POST http://127.0.0.1:3737/toggle
 ```
 
 **Check status:**
+
 ```bash
 ./chezwizper-status.sh
 # Or directly:
@@ -167,6 +171,7 @@ curl http://127.0.0.1:3737/status
 ```
 
 ### API Endpoints
+
 - `GET /` - Service info
 - `POST /toggle` - Toggle recording
 - `GET /status` - Get recording status
@@ -189,7 +194,7 @@ mkdir -p ~/.config/systemd/user
 nano ~/.config/systemd/user/chezwizper.service
 ```
 
-### 2. Add the following content:
+### 2. Add the following content
 
 ```ini
 [Unit]
@@ -276,6 +281,7 @@ If the service fails to start:
 5. For Wayland access issues, ensure `WAYLAND_DISPLAY` is set in your environment
 
 **Memory Issues:**
+
 - If the service crashes during transcription, check memory usage
 - Large Whisper models (large-v3) require 3-5GB of RAM
 - Adjust `MemoryLimit` in the service file if needed
@@ -350,23 +356,23 @@ delete_audio_files = true
 ## Troubleshooting
 
 ### Recording doesn't start
+
 - Check if you have microphone permissions
 - Verify audio device with `arecord -l`
 - Try changing the audio device in config
 
 ### Text injection fails
+
 - Ensure `wtype` or `ydotool` is installed
 - For `ydotool`, make sure `ydotoold` daemon is running
 - Try disabling `auto_paste` and use clipboard instead
 
 ### Whisper not found
+
 - Install whisper: `pip install openai-whisper` or build whisper.cpp
 - Set the correct path in `whisper.command_path` config
-
-### Keyboard shortcuts don't work
-- Run with `sudo` if needed (for global hotkeys)
-- Check if another application is using the same hotkey
 
 ## License
 
 MIT
+
