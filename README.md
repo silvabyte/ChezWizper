@@ -1,6 +1,6 @@
 # ChezWizper
 
-Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcuts, records audio, transcribes it using Whisper CLI, and inserts the transcribed text into the currently focused input field.
+Voice transcription tool for Wayland/Hyprland keybinds, records audio, transcribes it using Whisper CLI, and inserts the transcribed text into the currently focused input field.
 
 ## Features
 
