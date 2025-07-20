@@ -1,0 +1,30 @@
+[Unit]
+Description=ChezWizper Voice Transcription Service
+Documentation=https://github.com/matsilva/whispy
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/chezwizper
+Restart=always
+RestartSec=5
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+Environment="RUST_LOG=info"
+
+# Security and resource limits (optional)
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/chezwizper %t
+# Whisper models require significant memory (3-5GB for larger models)
+MemoryLimit=6G
+CPUQuota=80%
+
+# Required for audio access
+SupplementaryGroups=audio
+
+[Install]
+WantedBy=default.target

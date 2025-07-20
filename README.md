@@ -178,6 +178,109 @@ chezwizper --help
 chezwizper --verbose  # Enable debug logging
 ```
 
+## Running as a Service
+
+To run ChezWizper automatically on startup, you can create a systemd user service:
+
+### 1. Create the service file
+
+```bash
+mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/chezwizper.service
+```
+
+### 2. Add the following content:
+
+```ini
+[Unit]
+Description=ChezWizper Voice Transcription Service
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/chezwizper
+Restart=always
+RestartSec=5
+
+# Environment variables (optional)
+Environment="RUST_LOG=info"
+
+# Resource limits (optional)
+# Note: Whisper models require significant memory (3-5GB for larger models)
+MemoryLimit=6G
+CPUQuota=80%
+
+[Install]
+WantedBy=default.target
+```
+
+### 3. Enable and start the service
+
+```bash
+# Reload systemd to recognize the new service
+systemctl --user daemon-reload
+
+# Enable the service to start on boot
+systemctl --user enable chezwizper.service
+
+# Start the service immediately
+systemctl --user start chezwizper.service
+
+# Check service status
+systemctl --user status chezwizper.service
+```
+
+### 4. View logs
+
+```bash
+# View recent logs
+journalctl --user -u chezwizper.service -n 50
+
+# Follow logs in real-time
+journalctl --user -u chezwizper.service -f
+```
+
+### Service Management
+
+```bash
+# Stop the service
+systemctl --user stop chezwizper.service
+
+# Restart the service
+systemctl --user restart chezwizper.service
+
+# Disable auto-start
+systemctl --user disable chezwizper.service
+```
+
+### Alternative: Using chezwizper from source directory
+
+If you prefer to run from your build directory instead of installing system-wide:
+
+```ini
+[Service]
+Type=simple
+WorkingDirectory=/home/user/code/whispy
+ExecStart=/home/user/code/whispy/target/release/chezwizper
+# ... rest of the service file
+```
+
+### Troubleshooting
+
+If the service fails to start:
+
+1. Check logs: `journalctl --user -u chezwizper.service -e`
+2. Ensure the binary path is correct: `which chezwizper`
+3. Verify your config file is valid: `chezwizper --verbose`
+4. Make sure audio permissions are correct: `groups | grep audio`
+5. For Wayland access issues, ensure `WAYLAND_DISPLAY` is set in your environment
+
+**Memory Issues:**
+- If the service crashes during transcription, check memory usage
+- Large Whisper models (large-v3) require 3-5GB of RAM
+- Adjust `MemoryLimit` in the service file if needed
+- Monitor with: `systemctl --user status chezwizper.service`
+
 ## Configuration
 
 Configuration file is located at `~/.config/chezwizper/config.toml`:
