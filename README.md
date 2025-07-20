@@ -4,7 +4,7 @@ Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcut
 
 ## Features
 
-- 🎤 hyprland keybind to toggle recording (Super+R by default)
+- 🎤 use hyprland keybind to toggle recording (I use Super+R)
 - 🔴 Visual indicators for recording status via notifications
 - 🎯 Automatic text injection into focused applications
 - 📋 Clipboard integration with fallback support
@@ -27,6 +27,8 @@ sudo pacman -S rust wtype wl-clipboard alsa-lib curl
 ```
 
 ### Install system dependencies on Ubuntu/Debian
+
+\*\* Below is untested, if someone could confirm, that would be great!
 
 ```bash
 sudo apt install cargo libasound2-dev wl-clipboard curl
@@ -63,11 +65,11 @@ model_path = "/path/to/whisper/models/ggml-large-v3-turbo-q5_1.bin"
 
 ### Option 2: OpenAI Whisper (Python)
 
-Install the official OpenAI Whisper:
+Install the official [OpenAI Whisper:](https://github.com/openai/whisper)
 
 ```bash
 # Install via pip
-pip install openai-whisper
+pip install -U openai-whisper
 
 # Or with conda
 conda install -c conda-forge openai-whisper
@@ -375,4 +377,3 @@ delete_audio_files = true
 ## License
 
 MIT
-
