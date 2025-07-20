@@ -14,21 +14,92 @@ Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcut
 ## Prerequisites
 
 - Rust toolchain (1.70+)
-- Whisper CLI (`whisper` or `whisper-cpp`)
+- Whisper CLI (see [Whisper Installation Options](#whisper-installation-options) below)
 - Text injection tool: `wtype` (preferred) or `ydotool`
 - Wayland clipboard: `wl-clipboard`
 - Audio dependencies: `libasound2-dev` (ALSA)
 - `curl` for API communication
 
-### Install dependencies on Arch Linux:
+### Install system dependencies on Arch Linux:
 ```bash
-sudo pacman -S rust whisper-cpp wtype wl-clipboard alsa-lib curl
+sudo pacman -S rust wtype wl-clipboard alsa-lib curl
 ```
 
-### Install dependencies on Ubuntu/Debian:
+### Install system dependencies on Ubuntu/Debian:
 ```bash
 sudo apt install cargo libasound2-dev wl-clipboard curl
-# Install whisper and wtype from source or alternative repositories
+# Install wtype from source or alternative repositories
+```
+
+## Whisper Installation Options
+
+ChezWizper supports multiple Whisper implementations. Choose one:
+
+### Option 1: Optimized whisper.cpp (Recommended)
+
+This fork provides an optimized build script that handles everything automatically:
+
+```bash
+# Clone the optimized whisper.cpp fork
+git clone https://github.com/matsilva/whisper.git
+cd whisper
+
+# Run the universal build script
+# This will download models, quantize them, and compile whisper-cli
+./build.sh
+
+# The whisper-cli binary will be at: build/bin/whisper-cli
+```
+
+Then configure ChezWizper to use it:
+
+```toml
+[whisper]
+command_path = "/path/to/whisper/build/bin/whisper-cli"
+model_path = "/path/to/whisper/models/ggml-large-v3-turbo-q5_1.bin"
+```
+
+### Option 2: OpenAI Whisper (Python)
+
+Install the official OpenAI Whisper:
+
+```bash
+# Install via pip
+pip install openai-whisper
+
+# Or with conda
+conda install -c conda-forge openai-whisper
+```
+
+Then configure ChezWizper:
+
+```toml
+[whisper]
+# OpenAI whisper is usually in PATH after pip install
+command_path = "whisper"  # or leave empty to search PATH
+model = "base"  # or small, medium, large, large-v2, large-v3
+```
+
+### Option 3: Standard whisper.cpp
+
+```bash
+# Clone standard whisper.cpp
+git clone https://github.com/ggerganov/whisper.cpp.git
+cd whisper.cpp
+
+# Build
+make
+
+# Download models
+./models/download-ggml-model.sh base
+
+# Configure ChezWizper
+```
+
+```toml
+[whisper]
+command_path = "/path/to/whisper.cpp/main"
+model_path = "/path/to/whisper.cpp/models/ggml-base.bin"
 ```
 
 ## Building
@@ -111,10 +182,38 @@ chezwizper --verbose  # Enable debug logging
 
 Configuration file is located at `~/.config/chezwizper/config.toml`:
 
-```toml
-[hotkeys]
-toggle_recording = "Ctrl+Shift+A"
+### Example for Optimized whisper.cpp (Recommended)
 
+```toml
+[audio]
+device = "default"
+sample_rate = 16000
+channels = 1
+
+[whisper]
+model = "large-v3-turbo"  # Model name for reference
+language = "en"
+command_path = "/home/user/whisper/build/bin/whisper-cli"
+model_path = "/home/user/whisper/models/ggml-large-v3-turbo-q5_1.bin"
+```
+
+### Example for OpenAI Whisper
+
+```toml
+[audio]
+device = "default"
+sample_rate = 16000
+channels = 1
+
+[whisper]
+model = "base"  # Options: tiny, base, small, medium, large, large-v2, large-v3
+language = "en"
+# command_path = "whisper"  # Usually in PATH after pip install
+```
+
+### Full Configuration Example
+
+```toml
 [audio]
 device = "default"
 sample_rate = 16000
@@ -123,11 +222,10 @@ channels = 1
 [whisper]
 model = "base"
 language = "en"
-# Optional: specify custom whisper CLI path (if not specified, searches in PATH)
-# command_path = "/usr/local/bin/whisper"
-# command_path = "/home/user/code/whisper/build/bin/whisper-cli"
-# Optional: specify custom model file path (if not specified, uses default whisper.cpp format)
-# model_path = "/path/to/ggml-base.bin"
+# Optional: specify custom whisper CLI path
+# command_path = "/path/to/whisper-cli"
+# Optional: specify custom model file path (whisper.cpp only)
+# model_path = "/path/to/ggml-model.bin"
 
 [ui]
 indicator_position = "top-right"

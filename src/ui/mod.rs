@@ -1,33 +1,31 @@
 use anyhow::Result;
-use notify_rust::Notification;
 use std::process::Command;
 use tracing::{debug, info, warn};
 
 pub struct Indicator {
-    use_notifications: bool,
 }
 
 impl Indicator {
     pub fn new() -> Self {
         Self {
-            use_notifications: true,
         }
     }
     
     pub async fn show_recording(&self) -> Result<()> {
         info!("Showing recording indicator");
         
-        if self.use_notifications {
-            Notification::new()
-                .summary("ChezWizper")
-                .body("🔴 Recording audio...")
-                .icon("audio-input-microphone")
-                .timeout(3000) // Persistent
-                .show()?;
-        }
+        //example of using Notification lib..
+        //if self.use_notifications {
+        //    Notification::new()
+        //        .summary("ChezWizper")
+        //        .body("🔴 Recording audio...")
+        //        .icon("audio-input-microphone")
+        //        .timeout(3000) // Persistent
+        //        .show()?;
+        //}
         
         // Try to use Hyprland notification
-        if let Err(e) = self.hyprland_notify("Recording", "🔴 Recording audio...") {
+        if let Err(e) = self.hyprland_notify("🔴 Recording...") {
             debug!("Hyprland notification failed: {}", e);
         }
         
@@ -37,16 +35,16 @@ impl Indicator {
     pub async fn show_processing(&self) -> Result<()> {
         info!("Showing processing indicator");
         
-        if self.use_notifications {
-            Notification::new()
-                .summary("ChezWizper")
-                .body("⏳ Transcribing audio...")
-                .icon("audio-x-generic")
-                .timeout(5000)
-                .show()?;
-        }
+        //if self.use_notifications {
+        //    Notification::new()
+        //        .summary("ChezWizper")
+        //        .body("⏳ Transcribing audio...")
+        //        .icon("audio-x-generic")
+        //        .timeout(5000)
+        //        .show()?;
+        //}
         
-        if let Err(e) = self.hyprland_notify("Processing", "⏳ Transcribing audio...") {
+        if let Err(e) = self.hyprland_notify("⏳Normalizing...") {
             debug!("Hyprland notification failed: {}", e);
         }
         
@@ -62,16 +60,16 @@ impl Indicator {
             text.to_string()
         };
         
-        if self.use_notifications {
-            Notification::new()
-                .summary("ChezWizper")
-                .body(&format!("✅ Transcribed: {}", preview))
-                .icon("dialog-information")
-                .timeout(3000)
-                .show()?;
-        }
+        //if self.use_notifications {
+        //    Notification::new()
+        //        .summary("ChezWizper")
+        //        .body(&format!("✅ Transcribed: {}", preview))
+        //        .icon("dialog-information")
+        //        .timeout(3000)
+        //        .show()?;
+        //}
         
-        if let Err(e) = self.hyprland_notify("Complete", &format!("✅ {}", preview)) {
+        if let Err(e) = self.hyprland_notify(&format!("✅ {}", preview)) {
             debug!("Hyprland notification failed: {}", e);
         }
         
@@ -81,25 +79,26 @@ impl Indicator {
     pub async fn show_error(&self, error: &str) -> Result<()> {
         warn!("Showing error: {}", error);
         
-        if self.use_notifications {
-            Notification::new()
-                .summary("ChezWizper Error")
-                .body(error)
-                .icon("dialog-error")
-                .timeout(5000)
-                .show()?;
-        }
+        //if self.use_notifications {
+        //    Notification::new()
+        //        .summary("ChezWizper Error")
+        //        .body(error)
+        //        .icon("dialog-error")
+        //        .timeout(5000)
+        //        .show()?;
+        //}
         
-        if let Err(e) = self.hyprland_notify("Error", error) {
+        //        .body(&format!("✅ Transcribed: {}", preview))
+        if let Err(e) = self.hyprland_notify(&format!("Error: {}", error)) {
             debug!("Hyprland notification failed: {}", e);
         }
         
         Ok(())
     }
     
-    fn hyprland_notify(&self, title: &str, _message: &str) -> Result<()> {
+    fn hyprland_notify(&self, title: &str) -> Result<()> {
         Command::new("hyprctl")
-            .args(["notify", "-1", "5000", "rgb(ff1744)", title])
+            .args(["notify", "-1", "3000", "rgb(ff1744)", title])
             .output()?;
         
         Ok(())
