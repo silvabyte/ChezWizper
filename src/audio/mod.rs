@@ -157,15 +157,6 @@ impl AudioStreamManager {
         Ok(output_path)
     }
     
-    /// Get current recording state
-    pub fn get_state(&self) -> RecordingState {
-        *self.state.lock().unwrap()
-    }
-    
-    /// Check if currently recording
-    pub fn is_recording(&self) -> bool {
-        matches!(self.get_state(), RecordingState::Recording)
-    }
     
     /// Cleanup any active stream
     fn cleanup_stream(&self) {
@@ -185,30 +176,6 @@ impl Drop for AudioStreamManager {
     }
 }
 
-// Legacy AudioRecorder for backward compatibility
-pub struct AudioRecorder {
-    stream_manager: AudioStreamManager,
-}
-
-impl AudioRecorder {
-    pub fn new() -> Result<Self> {
-        Ok(Self {
-            stream_manager: AudioStreamManager::new()?,
-        })
-    }
-    
-    pub async fn start_recording(&self) -> Result<()> {
-        self.stream_manager.start_recording().await
-    }
-    
-    pub async fn stop_recording(&self, output_path: PathBuf) -> Result<PathBuf> {
-        self.stream_manager.stop_recording(output_path).await
-    }
-    
-    pub fn is_recording(&self) -> bool {
-        self.stream_manager.is_recording()
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -229,26 +196,6 @@ mod tests {
         }
         
         // This test may fail in CI without audio devices
-        if let Ok(manager) = AudioStreamManager::new() {
-            assert_eq!(manager.get_state(), RecordingState::Idle);
-            assert!(!manager.is_recording());
-        }
-    }
-    
-    #[tokio::test]
-    async fn test_recording_state_transitions() {
-        if is_ci() {
-            // Skip audio tests in CI - no audio devices available
-            return;
-        }
-        
-        if let Ok(manager) = AudioStreamManager::new() {
-            // Should start idle
-            assert_eq!(manager.get_state(), RecordingState::Idle);
-            
-            // Starting recording should fail without proper audio setup in test
-            // but we can test the state management logic
-            assert!(!manager.is_recording());
-        }
+        let _manager = AudioStreamManager::new();
     }
 }
