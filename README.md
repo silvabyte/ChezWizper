@@ -63,6 +63,8 @@ command_path = "/path/to/whisper/build/bin/whisper-cli"
 model_path = "/path/to/whisper/models/ggml-large-v3-turbo-q5_1.bin"
 ```
 
+See [Configuration](https://github.com/silvabyte/ChezWizper?tab=readme-ov-file#configuration)
+
 ### Option 2: OpenAI Whisper (Python)
 
 Install the official [OpenAI Whisper:](https://github.com/openai/whisper)
@@ -83,6 +85,8 @@ Then configure ChezWizper:
 command_path = "whisper"  # or leave empty to search PATH
 model = "base"  # or small, medium, large, large-v2, large-v3
 ```
+
+See [Configuration](https://github.com/silvabyte/ChezWizper?tab=readme-ov-file#configuration)
 
 ### Option 3: Standard whisper.cpp
 
@@ -105,6 +109,8 @@ make
 command_path = "/path/to/whisper.cpp/main"
 model_path = "/path/to/whisper.cpp/models/ggml-base.bin"
 ```
+
+See [Configuration](https://github.com/silvabyte/ChezWizper?tab=readme-ov-file#configuration)
 
 ## Building
 
