@@ -55,7 +55,6 @@ async fn main() -> Result<()> {
     
     // Load configuration
     let config = Config::load()?;
-    info!("Hotkey configured as: {}", config.hotkeys.toggle_recording);
     
     // Initialize components
     let (tx, mut rx) = mpsc::channel::<ApiCommand>(10);
@@ -90,7 +89,7 @@ async fn main() -> Result<()> {
     // Print instructions for Hyprland setup
     info!("ChezWizper is ready!");
     info!("Add this to your Hyprland config:");
-    info!("bind = CTRL SHIFT, A, exec, curl -X POST http://127.0.0.1:3737/toggle");
+    info!("bind = CTRL SHIFT, R, exec, -e curl -X POST http://127.0.0.1:3737/toggle");
     info!("Or test manually: curl -X POST http://127.0.0.1:3737/toggle");
     
     // Main event loop

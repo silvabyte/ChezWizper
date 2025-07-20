@@ -5,17 +5,11 @@ use tracing::info;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    pub hotkeys: HotkeyConfig,
     pub audio: AudioConfig,
     pub whisper: WhisperConfig,
     pub ui: UiConfig,
     pub wayland: WaylandConfig,
     pub behavior: BehaviorConfig,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HotkeyConfig {
-    pub toggle_recording: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -57,9 +51,6 @@ pub struct BehaviorConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            hotkeys: HotkeyConfig {
-                toggle_recording: "Ctrl+Shift+A".to_string(),
-            },
             audio: AudioConfig {
                 device: "default".to_string(),
                 sample_rate: 16000,
