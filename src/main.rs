@@ -4,6 +4,7 @@ mod clipboard;
 mod config;
 mod normalizer;
 mod text_injection;
+mod transcription;
 mod ui;
 mod whisper;
 
@@ -20,6 +21,7 @@ use crate::audio::AudioRecorder;
 use crate::clipboard::ClipboardManager;
 use crate::config::Config;
 use crate::text_injection::TextInjector;
+use crate::transcription::TranscriptionService;
 use crate::ui::Indicator;
 use crate::whisper::WhisperTranscriber;
 
@@ -61,10 +63,15 @@ async fn main() -> Result<()> {
     let (tx, mut rx) = mpsc::channel::<ApiCommand>(10);
     
     let audio_recorder = AudioRecorder::new()?;
+    
+    // Build whisper transcriber
     let whisper = WhisperTranscriber::new(config.whisper.command_path.clone())?
         .with_model(config.whisper.model.clone())
         .with_model_path(config.whisper.model_path.clone())
         .with_language(config.whisper.language.clone());
+    
+    // Compose transcription service with whisper and normalizer
+    let transcription_service = TranscriptionService::new(whisper)?;
     
     let text_injector = TextInjector::new()?;
     let mut clipboard = ClipboardManager::new()?
@@ -135,7 +142,7 @@ async fn main() -> Result<()> {
                             }
                             
                             // Transcribe audio
-                            match whisper.transcribe(&temp_path).await {
+                            match transcription_service.transcribe(&temp_path).await {
                                 Ok(text) => {
                                     if !text.is_empty() {
                                         info!("Transcription successful: {} chars", text.len());
