@@ -17,7 +17,7 @@ use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 use crate::api::{ApiCommand, ApiServer};
-use crate::audio::AudioRecorder;
+use crate::audio::AudioStreamManager;
 use crate::clipboard::ClipboardManager;
 use crate::config::Config;
 use crate::text_injection::TextInjector;
@@ -39,7 +39,7 @@ struct Args {
 #[derive(Clone)]
 struct RecordingState {
     recording: Arc<Mutex<bool>>,
-    audio_recorder: Arc<Mutex<AudioRecorder>>,
+    audio_recorder: Arc<Mutex<AudioStreamManager>>,
 }
 
 #[tokio::main]
@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
     // Initialize components
     let (tx, mut rx) = mpsc::channel::<ApiCommand>(10);
     
-    let audio_recorder = AudioRecorder::new()?;
+    let audio_recorder = AudioStreamManager::new()?;
     
     // Build whisper transcriber
     let whisper = WhisperTranscriber::new(config.whisper.command_path.clone())?
