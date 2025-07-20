@@ -1,0 +1,51 @@
+[package]
+name = "whispy"
+version = "0.1.0"
+edition = "2021"
+authors = ["Whispy Contributors"]
+description = "Voice transcription tool for Wayland/Hyprland"
+license = "MIT"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+
+# Audio recording
+cpal = "0.15"
+hound = "3.5"
+
+# Wayland integration
+wayland-client = "0.31"
+wayland-protocols = { version = "0.31", features = ["client"] }
+smithay-client-toolkit = "0.18"
+
+# Configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Logging and errors
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# System notifications
+notify-rust = "4.10"
+
+# Clipboard
+arboard = "3.3"
+
+# CLI args
+clap = { version = "4.4", features = ["derive"] }
+
+# Path handling
+dirs = "5.0"
+
+# Process management
+which = "6.0"
+
+# HTTP server
+axum = "0.7"
+tower = "0.4"
