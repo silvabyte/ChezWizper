@@ -7,14 +7,25 @@ use which::which;
 pub struct WhisperTranscriber {
     command_path: PathBuf,
     model: String,
+    model_path: Option<String>,
     language: String,
     is_openai_whisper: bool,
 }
 
 impl WhisperTranscriber {
-    pub fn new() -> Result<Self> {
-        let command_path = which("whisper")
-            .context("Whisper CLI not found. Please install whisper-cpp or openai-whisper")?;
+    pub fn new(custom_path: Option<String>) -> Result<Self> {
+        let command_path = if let Some(path) = custom_path {
+            let custom_path = PathBuf::from(path);
+            if custom_path.exists() {
+                info!("Using custom whisper path: {:?}", custom_path);
+                custom_path
+            } else {
+                return Err(anyhow::anyhow!("Custom whisper path does not exist: {:?}", custom_path));
+            }
+        } else {
+            which("whisper")
+                .context("Whisper CLI not found. Please install whisper-cpp or openai-whisper")?
+        };
         
         info!("Found whisper at: {:?}", command_path);
         
@@ -39,6 +50,7 @@ impl WhisperTranscriber {
         Ok(Self {
             command_path,
             model: "base".to_string(),
+            model_path: None,
             language: "en".to_string(),
             is_openai_whisper: is_openai,
         })
@@ -46,6 +58,11 @@ impl WhisperTranscriber {
     
     pub fn with_model(mut self, model: String) -> Self {
         self.model = model;
+        self
+    }
+    
+    pub fn with_model_path(mut self, model_path: Option<String>) -> Self {
+        self.model_path = model_path;
         self
     }
     
@@ -110,12 +127,19 @@ impl WhisperTranscriber {
         info!("Using whisper.cpp");
         warn!("whisper.cpp integration is experimental - consider using OpenAI whisper");
         
+        let model_arg = if let Some(model_path) = &self.model_path {
+            info!("Using custom model path: {}", model_path);
+            model_path.clone()
+        } else {
+            format!("models/ggml-{}.bin", self.model)
+        };
+        
         // For whisper.cpp, we'll capture stdout directly
         let output = Command::new(&self.command_path)
             .arg("-f")
             .arg(audio_path)
             .arg("-m")
-            .arg(&format!("models/ggml-{}.bin", self.model))
+            .arg(&model_arg)
             .arg("-l")
             .arg(&self.language)
             .arg("--output-txt")
@@ -128,10 +152,15 @@ impl WhisperTranscriber {
             
             // Fallback: try simpler command
             warn!("Trying fallback whisper.cpp command");
-            let output = Command::new(&self.command_path)
-                .arg("-f")
-                .arg(audio_path)
-                .output()
+            let mut cmd = Command::new(&self.command_path);
+            cmd.arg("-f").arg(audio_path);
+            
+            // Add model arg to fallback if we have a custom path
+            if let Some(model_path) = &self.model_path {
+                cmd.arg("-m").arg(model_path);
+            }
+            
+            let output = cmd.output()
                 .context("Failed to execute fallback whisper.cpp command")?;
             
             if !output.status.success() {

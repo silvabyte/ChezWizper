@@ -14,7 +14,11 @@ check_dependency() {
 
 echo "Checking dependencies..."
 check_dependency "cargo"
-check_dependency "whisper"
+
+# Check for whisper (optional - can be configured with custom path)
+if ! command -v whisper &> /dev/null; then
+    echo "Note: whisper not found in PATH. You can configure a custom path in config.toml"
+fi
 
 # Check for text injection tool
 if ! command -v wtype &> /dev/null && ! command -v ydotool &> /dev/null; then

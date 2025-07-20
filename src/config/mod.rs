@@ -24,6 +24,7 @@ pub struct WhisperConfig {
     pub model: String,
     pub language: String,
     pub command_path: Option<String>,
+    pub model_path: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -60,6 +61,7 @@ impl Default for Config {
                 model: "base".to_string(),
                 language: "en".to_string(),
                 command_path: None,
+                model_path: None,
             },
             ui: UiConfig {
                 indicator_position: "top-right".to_string(),

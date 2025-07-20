@@ -123,7 +123,11 @@ channels = 1
 [whisper]
 model = "base"
 language = "en"
-command_path = "/usr/local/bin/whisper"
+# Optional: specify custom whisper CLI path (if not specified, searches in PATH)
+# command_path = "/usr/local/bin/whisper"
+# command_path = "/home/user/code/whisper/build/bin/whisper-cli"
+# Optional: specify custom model file path (if not specified, uses default whisper.cpp format)
+# model_path = "/path/to/ggml-base.bin"
 
 [ui]
 indicator_position = "top-right"

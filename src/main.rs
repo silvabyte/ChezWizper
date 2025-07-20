@@ -60,8 +60,9 @@ async fn main() -> Result<()> {
     let (tx, mut rx) = mpsc::channel::<ApiCommand>(10);
     
     let audio_recorder = AudioRecorder::new()?;
-    let whisper = WhisperTranscriber::new()?
+    let whisper = WhisperTranscriber::new(config.whisper.command_path.clone())?
         .with_model(config.whisper.model.clone())
+        .with_model_path(config.whisper.model_path.clone())
         .with_language(config.whisper.language.clone());
     
     let text_injector = TextInjector::new()?;
