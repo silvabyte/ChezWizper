@@ -14,17 +14,6 @@ impl Indicator {
     pub async fn show_recording(&self) -> Result<()> {
         info!("Showing recording indicator");
         
-        //example of using Notification lib..
-        //if self.use_notifications {
-        //    Notification::new()
-        //        .summary("ChezWizper")
-        //        .body("🔴 Recording audio...")
-        //        .icon("audio-input-microphone")
-        //        .timeout(3000) // Persistent
-        //        .show()?;
-        //}
-        
-        // Try to use Hyprland notification
         if let Err(e) = self.hyprland_notify("🔴 Recording...") {
             debug!("Hyprland notification failed: {}", e);
         }
@@ -34,15 +23,6 @@ impl Indicator {
     
     pub async fn show_processing(&self) -> Result<()> {
         info!("Showing processing indicator");
-        
-        //if self.use_notifications {
-        //    Notification::new()
-        //        .summary("ChezWizper")
-        //        .body("⏳ Transcribing audio...")
-        //        .icon("audio-x-generic")
-        //        .timeout(5000)
-        //        .show()?;
-        //}
         
         if let Err(e) = self.hyprland_notify("⏳Normalizing...") {
             debug!("Hyprland notification failed: {}", e);
@@ -60,15 +40,6 @@ impl Indicator {
             text.to_string()
         };
         
-        //if self.use_notifications {
-        //    Notification::new()
-        //        .summary("ChezWizper")
-        //        .body(&format!("✅ Transcribed: {}", preview))
-        //        .icon("dialog-information")
-        //        .timeout(3000)
-        //        .show()?;
-        //}
-        
         if let Err(e) = self.hyprland_notify(&format!("✅ {}", preview)) {
             debug!("Hyprland notification failed: {}", e);
         }
@@ -79,16 +50,6 @@ impl Indicator {
     pub async fn show_error(&self, error: &str) -> Result<()> {
         warn!("Showing error: {}", error);
         
-        //if self.use_notifications {
-        //    Notification::new()
-        //        .summary("ChezWizper Error")
-        //        .body(error)
-        //        .icon("dialog-error")
-        //        .timeout(5000)
-        //        .show()?;
-        //}
-        
-        //        .body(&format!("✅ Transcribed: {}", preview))
         if let Err(e) = self.hyprland_notify(&format!("Error: {}", error)) {
             debug!("Hyprland notification failed: {}", e);
         }
