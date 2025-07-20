@@ -23,7 +23,7 @@ use crate::ui::Indicator;
 use crate::whisper::WhisperTranscriber;
 
 #[derive(Parser)]
-#[command(name = "whispy")]
+#[command(name = "chezwizper")]
 #[command(about = "Voice transcription tool for Wayland/Hyprland", long_about = None)]
 struct Args {
     #[arg(short, long)]
@@ -51,7 +51,7 @@ async fn main() -> Result<()> {
         .with_env_filter(env_filter)
         .init();
     
-    info!("Starting Whispy");
+    info!("Starting ChezWizper");
     
     // Load configuration
     let config = Config::load()?;
@@ -88,7 +88,7 @@ async fn main() -> Result<()> {
     });
     
     // Print instructions for Hyprland setup
-    info!("Whispy is ready!");
+    info!("ChezWizper is ready!");
     info!("Add this to your Hyprland config:");
     info!("bind = CTRL SHIFT, A, exec, curl -X POST http://127.0.0.1:3737/toggle");
     info!("Or test manually: curl -X POST http://127.0.0.1:3737/toggle");
@@ -120,7 +120,7 @@ async fn main() -> Result<()> {
                     info!("Stopping recording");
                     
                     let audio_recorder = state.audio_recorder.lock().await;
-                    let temp_path = PathBuf::from(format!("/tmp/whispy_{}.wav", 
+                    let temp_path = PathBuf::from(format!("/tmp/chezwizper_{}.wav", 
                         std::time::SystemTime::now()
                             .duration_since(std::time::UNIX_EPOCH)
                             .unwrap()

@@ -60,7 +60,7 @@ impl ApiServer {
 
 async fn status() -> Json<Value> {
     Json(json!({
-        "service": "whispy",
+        "service": "chezwizper",
         "version": "0.1.0",
         "status": "running"
     }))

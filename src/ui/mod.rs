@@ -19,7 +19,7 @@ impl Indicator {
         
         if self.use_notifications {
             Notification::new()
-                .summary("Whispy")
+                .summary("ChezWizper")
                 .body("🔴 Recording audio...")
                 .icon("audio-input-microphone")
                 .timeout(3000) // Persistent
@@ -39,7 +39,7 @@ impl Indicator {
         
         if self.use_notifications {
             Notification::new()
-                .summary("Whispy")
+                .summary("ChezWizper")
                 .body("⏳ Transcribing audio...")
                 .icon("audio-x-generic")
                 .timeout(5000)
@@ -64,7 +64,7 @@ impl Indicator {
         
         if self.use_notifications {
             Notification::new()
-                .summary("Whispy")
+                .summary("ChezWizper")
                 .body(&format!("✅ Transcribed: {}", preview))
                 .icon("dialog-information")
                 .timeout(3000)
@@ -83,7 +83,7 @@ impl Indicator {
         
         if self.use_notifications {
             Notification::new()
-                .summary("Whispy Error")
+                .summary("ChezWizper Error")
                 .body(error)
                 .icon("dialog-error")
                 .timeout(5000)

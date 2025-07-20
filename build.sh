@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Building Whispy..."
+echo "Building ChezWizper..."
 
 # Check for required dependencies
 check_dependency() {
@@ -27,10 +27,10 @@ fi
 echo "Building release version..."
 cargo build --release
 
-echo "Build complete! Binary is at: target/release/whispy"
+echo "Build complete! Binary is at: target/release/chezwizper"
 echo ""
 echo "To install system-wide:"
-echo "  sudo cp target/release/whispy /usr/local/bin/"
+echo "  sudo cp target/release/chezwizper /usr/local/bin/"
 echo ""
 echo "To run:"
-echo "  ./target/release/whispy"
+echo "  ./target/release/chezwizper"

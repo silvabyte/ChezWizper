@@ -132,6 +132,6 @@ impl Config {
         let config_dir = dirs::config_dir()
             .context("Failed to determine config directory")?;
         
-        Ok(config_dir.join("whispy").join("config.toml"))
+        Ok(config_dir.join("chezwizper").join("config.toml"))
     }
 }

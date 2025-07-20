@@ -1,4 +1,4 @@
-# Whispy
+# ChezWizper
 
 Voice transcription tool for Wayland/Hyprland that listens for keyboard shortcuts, records audio, transcribes it using Whisper CLI, and inserts the transcribed text into the currently focused input field.
 
@@ -44,22 +44,22 @@ cargo build --release
 cargo build --release
 
 # Copy binary to PATH
-sudo cp target/release/whispy /usr/local/bin/
+sudo cp target/release/chezwizper /usr/local/bin/
 
 # Create config directory
-mkdir -p ~/.config/whispy
+mkdir -p ~/.config/chezwizper
 
 # Run to generate default config
-whispy
+chezwizper
 ```
 
 ## Usage
 
 ### Setup for Hyprland
 
-1. Start Whispy:
+1. Start ChezWizper:
 ```bash
-whispy
+chezwizper
 ```
 
 2. Add keybind to your Hyprland config (`~/.config/hypr/hyprland.conf`):
@@ -69,7 +69,7 @@ bind = CTRL SHIFT, A, exec, curl -X POST http://127.0.0.1:3737/toggle
 
 Or use the provided script:
 ```bash
-./whispy-keybind.sh
+./chezwizper-keybind.sh
 ```
 
 3. Press `Ctrl+Shift+A` to start recording
@@ -79,18 +79,18 @@ Or use the provided script:
 7. Text will be automatically inserted at cursor position
 
 ### Manual Control
-You can also control Whispy manually:
+You can also control ChezWizper manually:
 
 **Toggle recording:**
 ```bash
-./whispy-toggle.sh
+./chezwizper-toggle.sh
 # Or directly:
 curl -X POST http://127.0.0.1:3737/toggle
 ```
 
 **Check status:**
 ```bash
-./whispy-status.sh
+./chezwizper-status.sh
 # Or directly:
 curl http://127.0.0.1:3737/status
 ```
@@ -103,13 +103,13 @@ curl http://127.0.0.1:3737/status
 ### Command Line Options
 
 ```bash
-whispy --help
-whispy --verbose  # Enable debug logging
+chezwizper --help
+chezwizper --verbose  # Enable debug logging
 ```
 
 ## Configuration
 
-Configuration file is located at `~/.config/whispy/config.toml`:
+Configuration file is located at `~/.config/chezwizper/config.toml`:
 
 ```toml
 [hotkeys]

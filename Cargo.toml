@@ -1,8 +1,8 @@
 [package]
-name = "whispy"
+name = "chezwizper"
 version = "0.1.0"
 edition = "2021"
-authors = ["Whispy Contributors"]
+authors = ["Mat Silva"]
 description = "Voice transcription tool for Wayland/Hyprland"
 license = "MIT"
 
