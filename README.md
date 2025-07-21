@@ -102,6 +102,18 @@ systemctl --user start ydotoold.service
 systemctl --user status ydotoold.service
 ```
 
+Finally, create a shortcut to toggle ChezWizper:
+
+Gnome Settings > Keyboard > Keyboard Shortcuts > View and Customize Shortcuts:
+
+Go to Custom Shortcuts, and add a new one with command:
+
+```bash
+bash /home/user/path-where-you-cloned-ChezWizper/chezwizper-toggle.sh
+```
+
+And you're good to go!
+
 ## Whisper Installation Options
 
 ChezWizper supports multiple Whisper implementations. Choose one:
