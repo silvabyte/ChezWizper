@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
     // Compose transcription service with whisper and normalizer
     let transcription_service = TranscriptionService::new(whisper)?;
     
-    let text_injector = TextInjector::new()?;
+    let text_injector = TextInjector::new(Some(&config.wayland.input_method))?;
     let mut clipboard = ClipboardManager::new()?
         .with_preserve(config.behavior.preserve_clipboard);
     
