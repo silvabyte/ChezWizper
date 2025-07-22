@@ -35,6 +35,85 @@ sudo apt install cargo libasound2-dev wl-clipboard curl
 # Install wtype from source or alternative repositories
 ```
 
+### Install system dependencies on Fedora 42+
+
+```bash
+sudo dnf install ydotool cmake gcc-c++ libevdev-devel libuinput-devel openssl-devel
+```
+
+#### Gnome and Wayland compatibility
+
+On GNOME with Wayland, ydotoold (the ydotool daemon) must be run as a user service because Wayland enforces strict security boundaries that prevent system-level services (running as root) from interacting with user input devices in a desktop session. Running ydotoold as a user service ensures it has access to your session’s input devices and environment, allowing tools like ChezWizper to inject text reliably and securely into applications. This approach also avoids permission issues and aligns with modern desktop security practices, making native text injection possible without requiring root privileges.
+
+The wtype tool does not work for text injection on GNOME with Wayland because GNOME’s compositor (Mutter) does not implement the “virtual keyboard protocol” required by wtype to simulate keyboard input. This protocol is only supported by some other Wayland compositors (such as Sway or Hyprland). As a result, attempts to use wtype on GNOME/Wayland will fail with errors like “Compositor does not support the virtual keyboard protocol.” For this reason, using ydotool (with its daemon running as a user service) is the recommended and reliable method for text injection on GNOME + Wayland.
+
+So, let's configure `ydotool` properly. Create the user service file:
+
+```sh
+mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/ydotoold.service
+```
+
+Paste:
+
+```ini
+[Unit]
+Description=ydotoold user daemon
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ydotoold -P 660
+
+[Install]
+WantedBy=default.target
+```
+
+*(Adjust the path to `ydotoold` if needed, e.g., `/usr/local/bin/ydotoold` if you built from source)*
+Run `which ydotool` to check the path on your system.
+
+Add this to your `.bashrc` or `.zshrc`:
+
+```bash
+export YDOTOOL_SOCKET="/run/user/$(id -u)/.ydotool_socket"
+```
+
+And source it if you don't want to restart you session:
+
+```sh
+source ~/.bashrc
+source ~/.zshrc
+```
+
+*Make sure* you configure ChezWizper to use ydotool:
+
+```toml
+[wayland]
+input_method = "ydotool"
+use_hyprland_ipc = false
+```
+
+Then Enable and Start the User Service
+
+```sh
+systemctl --user daemon-reload
+systemctl --user enable ydotoold.service
+systemctl --user start ydotoold.service
+systemctl --user status ydotoold.service
+```
+
+Finally, create a shortcut to toggle ChezWizper:
+
+Gnome Settings > Keyboard > Keyboard Shortcuts > View and Customize Shortcuts:
+
+Go to Custom Shortcuts, and add a new one with command:
+
+```bash
+bash /home/user/path-where-you-cloned-ChezWizper/chezwizper-toggle.sh
+```
+
+And you're good to go!
+
 ## Whisper Installation Options
 
 ChezWizper supports multiple Whisper implementations. Choose one:

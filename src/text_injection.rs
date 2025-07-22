@@ -14,23 +14,38 @@ enum InjectionMethod {
 }
 
 impl TextInjector {
-    pub fn new() -> Result<Self> {
-        // Try to find wtype first (preferred for Wayland)
+    pub fn new(preferred: Option<&str>) -> Result<Self> {
+        match preferred {
+            Some("ydotool") => {
+                if which("ydotool").is_ok() {
+                    info!("Using ydotool for text injection (per config)");
+                    return Ok(Self { method: InjectionMethod::Ydotool });
+                } else {
+                    warn!("ydotool requested in config but not found, falling back...");
+                }
+            }
+            Some("wtype") => {
+                if which("wtype").is_ok() {
+                    info!("Using wtype for text injection (per config)");
+                    return Ok(Self { method: InjectionMethod::Wtype });
+                } else {
+                    warn!("wtype requested in config but not found, falling back...");
+                }
+            }
+            Some(other) => {
+                warn!("Unknown input_method '{}' in config, falling back to auto-detect", other);
+            }
+            None => {}
+        }
+        // Fallback logic
         if which("wtype").is_ok() {
-            info!("Using wtype for text injection");
-            return Ok(Self {
-                method: InjectionMethod::Wtype,
-            });
+            info!("Using wtype for text injection (auto-detected)");
+            return Ok(Self { method: InjectionMethod::Wtype });
         }
-        
-        // Fall back to ydotool
         if which("ydotool").is_ok() {
-            info!("Using ydotool for text injection");
-            return Ok(Self {
-                method: InjectionMethod::Ydotool,
-            });
+            info!("Using ydotool for text injection (auto-detected)");
+            return Ok(Self { method: InjectionMethod::Ydotool });
         }
-        
         Err(anyhow::anyhow!("No text injection tool found. Please install wtype or ydotool"))
     }
     
