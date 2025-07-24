@@ -107,7 +107,7 @@ impl Indicator {
         
         // Try generating custom beep tones first (more distinctive)
         if let Ok(output) = Self::generate_beep_tone(freq, duration_ms).await {
-            if output.status.success() {
+            if output.status.success() || output.status.code() == Some(124) {
                 debug!("Played {} with generated tone ({}Hz, {}ms)", sound_type, freq, duration_ms);
                 return Ok(());
             }
@@ -142,9 +142,10 @@ impl Indicator {
         // Try different methods to generate custom beep tones
         
         // Method 1: Use speaker-test (if available)
+        let duration_secs = format!("{:.1}", duration_ms as f64 / 1000.0);
         if let Ok(output) = Command::new("timeout")
             .args(&[
-                &format!("{}ms", duration_ms),
+                &duration_secs,
                 "speaker-test", 
                 "-t", "sine", 
                 "-f", &freq.to_string(), 
@@ -152,7 +153,9 @@ impl Indicator {
             ])
             .output()
         {
-            return Ok(output);
+            if output.status.success() || output.status.code() == Some(124) { // 124 = timeout success
+                return Ok(output);
+            }
         }
         
         // Method 2: Use beep command (if available)
