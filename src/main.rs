@@ -77,7 +77,8 @@ async fn main() -> Result<()> {
     let mut clipboard = ClipboardManager::new()?
         .with_preserve(config.behavior.preserve_clipboard);
     
-    let indicator = Indicator::new();
+    let indicator = Indicator::new()
+        .with_audio_feedback(config.behavior.audio_feedback);
     
     let recording_flag = Arc::new(Mutex::new(false));
     let state = RecordingState {

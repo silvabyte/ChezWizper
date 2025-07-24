@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use tracing::info;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Config {
     pub audio: AudioConfig,
     pub whisper: WhisperConfig,
@@ -13,6 +14,7 @@ pub struct Config {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AudioConfig {
     pub device: String,
     pub sample_rate: u32,
@@ -20,6 +22,7 @@ pub struct AudioConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct WhisperConfig {
     pub model: String,
     pub language: String,
@@ -28,6 +31,7 @@ pub struct WhisperConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct UiConfig {
     pub indicator_position: String,
     pub indicator_size: u32,
@@ -37,48 +41,87 @@ pub struct UiConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct WaylandConfig {
     pub input_method: String,
     pub use_hyprland_ipc: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct BehaviorConfig {
     pub auto_paste: bool,
     pub preserve_clipboard: bool,
     pub delete_audio_files: bool,
+    #[serde(default = "default_audio_feedback")]
+    pub audio_feedback: bool,
+}
+
+fn default_audio_feedback() -> bool {
+    true
+}
+
+impl Default for AudioConfig {
+    fn default() -> Self {
+        Self {
+            device: "default".to_string(),
+            sample_rate: 16000,
+            channels: 1,
+        }
+    }
+}
+
+impl Default for WhisperConfig {
+    fn default() -> Self {
+        Self {
+            model: "base".to_string(),
+            language: "en".to_string(),
+            command_path: None,
+            model_path: None,
+        }
+    }
+}
+
+impl Default for UiConfig {
+    fn default() -> Self {
+        Self {
+            indicator_position: "top-right".to_string(),
+            indicator_size: 20,
+            show_notifications: true,
+            layer_shell_anchor: "top | right".to_string(),
+            layer_shell_margin: 10,
+        }
+    }
+}
+
+impl Default for WaylandConfig {
+    fn default() -> Self {
+        Self {
+            input_method: "wtype".to_string(),
+            use_hyprland_ipc: true,
+        }
+    }
+}
+
+impl Default for BehaviorConfig {
+    fn default() -> Self {
+        Self {
+            auto_paste: true,
+            preserve_clipboard: false,
+            delete_audio_files: true,
+            audio_feedback: true,
+        }
+    }
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            audio: AudioConfig {
-                device: "default".to_string(),
-                sample_rate: 16000,
-                channels: 1,
-            },
-            whisper: WhisperConfig {
-                model: "base".to_string(),
-                language: "en".to_string(),
-                command_path: None,
-                model_path: None,
-            },
-            ui: UiConfig {
-                indicator_position: "top-right".to_string(),
-                indicator_size: 20,
-                show_notifications: true,
-                layer_shell_anchor: "top | right".to_string(),
-                layer_shell_margin: 10,
-            },
-            wayland: WaylandConfig {
-                input_method: "wtype".to_string(),
-                use_hyprland_ipc: true,
-            },
-            behavior: BehaviorConfig {
-                auto_paste: true,
-                preserve_clipboard: false,
-                delete_audio_files: true,
-            },
+            audio: AudioConfig::default(),
+            whisper: WhisperConfig::default(),
+            ui: UiConfig::default(),
+            wayland: WaylandConfig::default(),
+            behavior: BehaviorConfig::default(),
         }
     }
 }
