@@ -28,6 +28,8 @@ pub struct WhisperConfig {
     pub language: String,
     pub command_path: Option<String>,
     pub model_path: Option<String>,
+    pub use_api: bool,
+    pub api_endpoint: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -117,11 +119,35 @@ impl Default for BehaviorConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            audio: AudioConfig::default(),
-            whisper: WhisperConfig::default(),
-            ui: UiConfig::default(),
-            wayland: WaylandConfig::default(),
-            behavior: BehaviorConfig::default(),
+            audio: AudioConfig {
+                device: "default".to_string(),
+                sample_rate: 16000,
+                channels: 1,
+            },
+            whisper: WhisperConfig {
+                model: "base".to_string(),
+                language: "en".to_string(),
+                command_path: None,
+                model_path: None,
+                use_api: false,
+                api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
+            },
+            ui: UiConfig {
+                indicator_position: "top-right".to_string(),
+                indicator_size: 20,
+                show_notifications: true,
+                layer_shell_anchor: "top | right".to_string(),
+                layer_shell_margin: 10,
+            },
+            wayland: WaylandConfig {
+                input_method: "wtype".to_string(),
+                use_hyprland_ipc: true,
+            },
+            behavior: BehaviorConfig {
+                auto_paste: true,
+                preserve_clipboard: false,
+                delete_audio_files: true,
+            },
         }
     }
 }
@@ -129,7 +155,10 @@ impl Default for Config {
 impl Config {
     pub fn load() -> Result<Self> {
         let config_path = Self::config_path()?;
-        
+        Self::load_from_path(config_path)
+    }
+    
+    pub fn load_from_path(config_path: PathBuf) -> Result<Self> {
         if !config_path.exists() {
             info!("Config file not found, creating default at {:?}", config_path);
             let config = Self::default();
