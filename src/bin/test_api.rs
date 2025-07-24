@@ -1,6 +1,5 @@
 use anyhow::Result;
 use chezwizper::whisper::WhisperTranscriber;
-use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
