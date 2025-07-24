@@ -98,33 +98,28 @@ impl Indicator {
     }
     
     async fn play_simple_sound(sound_type: &str) -> Result<()> {
-        let (freq, _duration_ms) = match sound_type {
-            "start" => (800, 150),
-            "stop" => (400, 200),  
-            "complete" => (600, 100),
+        let (freq, duration_ms) = match sound_type {
+            "start" => (800, 150),      // High pitch, short beep
+            "stop" => (400, 200),       // Low pitch, longer beep  
+            "complete" => (1000, 100),  // Very high pitch, very short beep
             _ => (500, 150),
         };
         
-        // Try different sound files based on sound type
-        let sound_files = match sound_type {
-            "start" => vec![
-                "/usr/share/sounds/alsa/Front_Left.wav",
-                "/usr/share/sounds/freedesktop/stereo/bell.oga",
-                "/usr/share/sounds/Oxygen-Sys-Log-In.ogg"
-            ],
-            "stop" => vec![
-                "/usr/share/sounds/alsa/Front_Right.wav", 
-                "/usr/share/sounds/alsa/Front_Left.wav",
-                "/usr/share/sounds/freedesktop/stereo/bell.oga"
-            ],
-            _ => vec![
-                "/usr/share/sounds/alsa/Front_Center.wav",
-                "/usr/share/sounds/alsa/Front_Left.wav", 
-                "/usr/share/sounds/freedesktop/stereo/bell.oga"
-            ],
-        };
+        // Try generating custom beep tones first (more distinctive)
+        if let Ok(output) = Self::generate_beep_tone(freq, duration_ms).await {
+            if output.status.success() {
+                debug!("Played {} with generated tone ({}Hz, {}ms)", sound_type, freq, duration_ms);
+                return Ok(());
+            }
+        }
         
-        // Try aplay with system sounds first (we know this works)
+        // Fallback to system sounds if tone generation fails
+        let sound_files = vec![
+            "/usr/share/sounds/alsa/Front_Left.wav",
+            "/usr/share/sounds/freedesktop/stereo/bell.oga",
+            "/usr/share/sounds/Oxygen-Sys-Log-In.ogg"
+        ];
+        
         for sound_file in sound_files {
             if std::path::Path::new(sound_file).exists() {
                 if let Ok(output) = Command::new("aplay")
@@ -139,30 +134,58 @@ impl Indicator {
             }
         }
         
-        // Try pactl as fallback (less reliable on this system)
-        if let Ok(output) = Command::new("pactl")
-            .args(&["play-sample", "bell-window-system"])
-            .output()
-        {
-            if output.status.success() {
-                debug!("Played {} with pactl", sound_type);
-                return Ok(());
-            }
-        }
-        
-        // Final fallback - beep command if available
-        if let Ok(output) = Command::new("beep")
-            .args(&["-f", &freq.to_string(), "-l", "100"])
-            .output()
-        {
-            if output.status.success() {
-                debug!("Played {} with beep", sound_type);
-                return Ok(());
-            }
-        }
-        
         debug!("No working sound method found for {}", sound_type);
         Ok(())
+    }
+    
+    async fn generate_beep_tone(freq: u32, duration_ms: u32) -> Result<std::process::Output> {
+        // Try different methods to generate custom beep tones
+        
+        // Method 1: Use speaker-test (if available)
+        if let Ok(output) = Command::new("timeout")
+            .args(&[
+                &format!("{}ms", duration_ms),
+                "speaker-test", 
+                "-t", "sine", 
+                "-f", &freq.to_string(), 
+                "-c", "1"
+            ])
+            .output()
+        {
+            return Ok(output);
+        }
+        
+        // Method 2: Use beep command (if available)
+        if let Ok(output) = Command::new("beep")
+            .args(&["-f", &freq.to_string(), "-l", &duration_ms.to_string()])
+            .output()
+        {
+            return Ok(output);
+        }
+        
+        // Method 3: Generate tone with paplay + Python
+        let python_cmd = format!(
+            "python3 -c \"
+import math, sys
+samples = int(44100 * {} / 1000)
+freq = {}
+for i in range(samples):
+    t = i / 44100.0
+    sample = math.sin(2.0 * math.pi * freq * t) * 0.3
+    sample_i16 = int(sample * 16384)
+    sys.stdout.buffer.write(sample_i16.to_bytes(2, 'little', signed=True))
+\" | paplay --raw --format=s16le --rate=44100 --channels=1",
+            duration_ms, freq
+        );
+        
+        if let Ok(output) = Command::new("bash")
+            .args(&["-c", &python_cmd])
+            .output()
+        {
+            return Ok(output);
+        }
+        
+        Err(anyhow::anyhow!("No tone generation method available"))
     }
     
 }
