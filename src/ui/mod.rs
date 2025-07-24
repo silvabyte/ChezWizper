@@ -105,27 +105,63 @@ impl Indicator {
             _ => (500, 150),
         };
         
-        // Try paplay first (most reliable)
-        if let Ok(_) = Command::new("pactl")
+        // Try different sound files based on sound type
+        let sound_files = match sound_type {
+            "start" => vec![
+                "/usr/share/sounds/alsa/Front_Left.wav",
+                "/usr/share/sounds/freedesktop/stereo/bell.oga",
+                "/usr/share/sounds/Oxygen-Sys-Log-In.ogg"
+            ],
+            "stop" => vec![
+                "/usr/share/sounds/alsa/Front_Right.wav", 
+                "/usr/share/sounds/alsa/Front_Left.wav",
+                "/usr/share/sounds/freedesktop/stereo/bell.oga"
+            ],
+            _ => vec![
+                "/usr/share/sounds/alsa/Front_Center.wav",
+                "/usr/share/sounds/alsa/Front_Left.wav", 
+                "/usr/share/sounds/freedesktop/stereo/bell.oga"
+            ],
+        };
+        
+        // Try aplay with system sounds first (we know this works)
+        for sound_file in sound_files {
+            if std::path::Path::new(sound_file).exists() {
+                if let Ok(output) = Command::new("aplay")
+                    .arg(sound_file)
+                    .output()
+                {
+                    if output.status.success() {
+                        debug!("Played {} with aplay: {}", sound_type, sound_file);
+                        return Ok(());
+                    }
+                }
+            }
+        }
+        
+        // Try pactl as fallback (less reliable on this system)
+        if let Ok(output) = Command::new("pactl")
             .args(&["play-sample", "bell-window-system"])
             .output()
         {
-            return Ok(());
+            if output.status.success() {
+                debug!("Played {} with pactl", sound_type);
+                return Ok(());
+            }
         }
         
-        // Try aplay with system sound
-        if let Ok(_) = Command::new("aplay")
-            .args(&["/usr/share/sounds/alsa/Front_Left.wav"])
+        // Final fallback - beep command if available
+        if let Ok(output) = Command::new("beep")
+            .args(&["-f", &freq.to_string(), "-l", "100"])
             .output()
         {
-            return Ok(());
+            if output.status.success() {
+                debug!("Played {} with beep", sound_type);
+                return Ok(());
+            }
         }
         
-        // Fallback to speaker-test
-        Command::new("timeout")
-            .args(&["0.2", "speaker-test", "-t", "sine", "-f", &freq.to_string(), "-c", "1"])
-            .output()?;
-            
+        debug!("No working sound method found for {}", sound_type);
         Ok(())
     }
     

@@ -1,0 +1,12 @@
+[2m2025-07-24T12:39:48.716863Z[0m [32m INFO[0m [2mchezwizper[0m[2m:[0m Starting ChezWizper
+[2m2025-07-24T12:39:48.716991Z[0m [32m INFO[0m [2mchezwizper::config[0m[2m:[0m Loaded config from "example_config_api.toml"
+[2m2025-07-24T12:39:48.717015Z[0m [32m INFO[0m [2mchezwizper::audio[0m[2m:[0m Using audio device: default
+[2m2025-07-24T12:39:48.729712Z[0m [32m INFO[0m [2mchezwizper::whisper::api_client[0m[2m:[0m Initialized OpenAI client with endpoint: https://api.openai.com/v1/audio/transcriptions
+[2m2025-07-24T12:39:48.729736Z[0m [32m INFO[0m [2mchezwizper::whisper[0m[2m:[0m Using OpenAI API for transcription
+[2m2025-07-24T12:39:48.729743Z[0m [32m INFO[0m [2mchezwizper::normalizer[0m[2m:[0m Creating whisper.cpp normalizer
+[2m2025-07-24T12:39:48.730376Z[0m [32m INFO[0m [2mchezwizper::text_injection[0m[2m:[0m Using wtype for text injection (per config)
+[2m2025-07-24T12:39:48.730890Z[0m [32m INFO[0m [2mchezwizper[0m[2m:[0m ChezWizper is ready!
+[2m2025-07-24T12:39:48.730916Z[0m [32m INFO[0m [2mchezwizper[0m[2m:[0m Add this to your Hyprland config:
+[2m2025-07-24T12:39:48.730926Z[0m [32m INFO[0m [2mchezwizper[0m[2m:[0m bind = CTRL SHIFT, R, exec, -e curl -X POST http://127.0.0.1:3737/toggle
+[2m2025-07-24T12:39:48.730934Z[0m [32m INFO[0m [2mchezwizper[0m[2m:[0m Or test manually: curl -X POST http://127.0.0.1:3737/toggle
+[2m2025-07-24T12:39:48.731012Z[0m [31mERROR[0m [2mchezwizper[0m[2m:[0m API server failed: Address already in use (os error 98)
