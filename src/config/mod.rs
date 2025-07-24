@@ -28,6 +28,8 @@ pub struct WhisperConfig {
     pub language: String,
     pub command_path: Option<String>,
     pub model_path: Option<String>,
+    pub use_api: bool,
+    pub api_endpoint: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -78,6 +80,8 @@ impl Default for WhisperConfig {
             language: "en".to_string(),
             command_path: None,
             model_path: None,
+            use_api: false,
+            api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
         }
     }
 }
@@ -117,7 +121,10 @@ impl Default for BehaviorConfig {
 impl Config {
     pub fn load() -> Result<Self> {
         let config_path = Self::config_path()?;
-
+        Self::load_from_path(config_path)
+    }
+    
+    pub fn load_from_path(config_path: PathBuf) -> Result<Self> {
         if !config_path.exists() {
             info!(
                 "Config file not found, creating default at {:?}",
