@@ -156,10 +156,6 @@ async fn main() -> Result<()> {
                                     if !text.is_empty() {
                                         info!("Transcription successful: {} chars", text.len());
                                         
-                                        // Debug: Save transcription to file
-                                        std::fs::write("/tmp/last_transcription.txt", &text).ok();
-                                        info!("Transcription saved to /tmp/last_transcription.txt: '{}'", text);
-                                        
                                         // Copy to clipboard
                                         if let Err(e) = clipboard.copy_with_wayland_fallback(&text).await {
                                             error!("Failed to copy to clipboard: {}", e);

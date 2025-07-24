@@ -11,20 +11,8 @@ name = "chezwizper"
 path = "src/main.rs"
 
 [[bin]]
-name = "test_api"
-path = "src/bin/test_api.rs"
-
-[[bin]]
 name = "transcribe_file"
 path = "src/bin/transcribe_file.rs"
-
-[[bin]]
-name = "audio_info"
-path = "src/bin/audio_info.rs"
-
-[[bin]]
-name = "test_ui_sounds"
-path = "src/bin/test_ui_sounds.rs"
 
 [dependencies]
 # Async runtime

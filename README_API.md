@@ -87,16 +87,16 @@ For heavy usage, consider:
 
 ## Testing
 
-Test API integration without audio recording:
-
-```bash
-OPENAI_API_KEY="your-key" cargo run --bin test_api
-```
-
 Test with configuration file:
 
 ```bash
-OPENAI_API_KEY="your-key" cargo run --bin chezwizper -- --config example_config_api.toml
+OPENAI_API_KEY="your-key" ./target/release/chezwizper --config example_config_api.toml
+```
+
+Test direct file transcription:
+
+```bash
+./target/release/transcribe_file your_audio.wav
 ```
 
 ## Security
