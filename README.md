@@ -2,6 +2,8 @@
 
 Voice transcription tool for Wayland/Hyprland keybinds, records audio, transcribes it using Whisper CLI, and inserts the transcribed text into the currently focused input field.
 
+📚 **[View Documentation](./docs/index.md)** - Detailed configuration guides and more
+
 ## Features
 
 - 🎤 use hyprland keybind to toggle recording (I use Super+R)
