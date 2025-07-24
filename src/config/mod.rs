@@ -49,6 +49,7 @@ pub struct BehaviorConfig {
     pub auto_paste: bool,
     pub preserve_clipboard: bool,
     pub delete_audio_files: bool,
+    pub audio_feedback: bool,
 }
 
 impl Default for Config {
@@ -82,6 +83,7 @@ impl Default for Config {
                 auto_paste: true,
                 preserve_clipboard: false,
                 delete_audio_files: true,
+                audio_feedback: true,
             },
         }
     }

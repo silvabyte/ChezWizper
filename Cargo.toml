@@ -18,6 +18,10 @@ path = "src/bin/test_api.rs"
 name = "transcribe_file"
 path = "src/bin/transcribe_file.rs"
 
+[[bin]]
+name = "audio_info"
+path = "src/bin/audio_info.rs"
+
 [dependencies]
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }

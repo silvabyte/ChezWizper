@@ -24,4 +24,5 @@ use_hyprland_ipc = true
 [behavior]
 auto_paste = true
 preserve_clipboard = false
-delete_audio_files = true
+delete_audio_files = false  # Keep files for debugging
+audio_feedback = true       # Play sounds for recording start/stop

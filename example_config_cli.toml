@@ -25,3 +25,4 @@ use_hyprland_ipc = true
 auto_paste = true
 preserve_clipboard = false
 delete_audio_files = true
+audio_feedback = true  # Play sounds for recording start/stop

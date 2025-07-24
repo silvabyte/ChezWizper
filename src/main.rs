@@ -85,7 +85,8 @@ async fn main() -> Result<()> {
     let mut clipboard = ClipboardManager::new()?
         .with_preserve(config.behavior.preserve_clipboard);
     
-    let indicator = Indicator::new();
+    let indicator = Indicator::new()
+        .with_audio_feedback(config.behavior.audio_feedback);
     
     let recording_flag = Arc::new(Mutex::new(false));
     let state = RecordingState {
@@ -154,6 +155,10 @@ async fn main() -> Result<()> {
                                 Ok(text) => {
                                     if !text.is_empty() {
                                         info!("Transcription successful: {} chars", text.len());
+                                        
+                                        // Debug: Save transcription to file
+                                        std::fs::write("/tmp/last_transcription.txt", &text).ok();
+                                        info!("Transcription saved to /tmp/last_transcription.txt: '{}'", text);
                                         
                                         // Copy to clipboard
                                         if let Err(e) = clipboard.copy_with_wayland_fallback(&text).await {
