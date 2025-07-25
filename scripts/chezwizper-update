@@ -1,0 +1,21 @@
+#!/bin/bash
+# System-wide update wrapper for ChezWizper
+# This script is installed to /usr/local/bin for easy access
+
+CHEZWIZPER_SOURCE_DIR="${CHEZWIZPER_SOURCE_DIR:-/home/matsilva/.local/share/chezwizper/source}"
+
+if [ ! -d "$CHEZWIZPER_SOURCE_DIR" ]; then
+  echo "Error: ChezWizper source directory not found at $CHEZWIZPER_SOURCE_DIR"
+  echo "Please set CHEZWIZPER_SOURCE_DIR environment variable or reinstall ChezWizper"
+  exit 1
+fi
+
+if [ ! -f "$CHEZWIZPER_SOURCE_DIR/update-chezwizper.sh" ]; then
+  echo "Error: Update script not found in source directory"
+  echo "Please reinstall ChezWizper"
+  exit 1
+fi
+
+# Pass all arguments to the actual update script
+exec "$CHEZWIZPER_SOURCE_DIR/update-chezwizper.sh" "$@"
+
