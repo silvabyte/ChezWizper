@@ -105,7 +105,7 @@ echo
 # Check if ChezWizper is installed
 if [ ! -f "$INSTALL_DIR/chezwizper" ]; then
     print_error "ChezWizper not found in $INSTALL_DIR"
-    print_warning "Please run install-arch.sh first"
+    print_warning "Please run scripts/install-arch.sh first"
     exit 1
 fi
 
@@ -187,7 +187,8 @@ if [ "$CHEZWIZPER_UPDATE_AVAILABLE" = true ] || [ "$FORCE_UPDATE" = true ]; then
     cd "$CHEZWIZPER_DIR"
     
     # Pull latest changes
-    if ! git pull origin main; then
+    DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+    if ! git pull origin "$DEFAULT_BRANCH"; then
         print_error "Failed to pull latest changes"
         exit 1
     fi
@@ -216,14 +217,16 @@ if [ "$UPDATE_WHISPER" = true ] && [ "${WHISPER_UPDATE_AVAILABLE:-false}" = true
     cd "$WHISPER_DIR"
     
     # Pull latest changes
-    if ! git pull origin main; then
+    WHISPER_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+    if ! git pull origin "$WHISPER_BRANCH"; then
         print_error "Failed to pull whisper.cpp updates"
         exit 1
     fi
     
     # Clean and rebuild
     print_step "Rebuilding whisper.cpp (this may take a while)..."
-    make clean
+    # Clean build directory if it exists
+    [ -d build ] && rm -rf build
     if ! ./build.sh; then
         print_error "Failed to build whisper.cpp"
         exit 1
@@ -235,17 +238,12 @@ fi
 # Check for configuration changes
 print_step "Checking configuration compatibility..."
 
-# Create a temporary config to check for new fields
-"$INSTALL_DIR/chezwizper" --generate-config 2>/dev/null || true
-
-if [ -f "/tmp/chezwizper_default_config.toml" ]; then
-    # Compare configs (basic check)
-    if ! diff -q "$CONFIG_DIR/config.toml" "/tmp/chezwizper_default_config.toml" >/dev/null 2>&1; then
-        print_warning "Configuration format may have changed. Please review your config at:"
-        echo "  $CONFIG_DIR/config.toml"
-        echo "  A backup was saved to: $BACKUP_DIR/config_${BACKUP_DATE}.toml"
-    fi
-    rm -f "/tmp/chezwizper_default_config.toml"
+# Simply warn user to check for new config options
+if [ -f "$CONFIG_DIR/config.toml" ]; then
+    print_warning "Please check if new configuration options are available:"
+    echo "  Current config: $CONFIG_DIR/config.toml"
+    echo "  Backup saved to: $BACKUP_DIR/config_${BACKUP_DATE}.toml"
+    echo "  Check documentation at: https://github.com/silvabyte/ChezWizper/blob/main/docs/"
 fi
 
 # Update systemd service if needed

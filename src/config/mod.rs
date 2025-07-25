@@ -1,9 +1,9 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tracing::info;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Config {
     pub audio: AudioConfig,
@@ -114,60 +114,46 @@ impl Default for BehaviorConfig {
     }
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            audio: AudioConfig::default(),
-            whisper: WhisperConfig::default(),
-            ui: UiConfig::default(),
-            wayland: WaylandConfig::default(),
-            behavior: BehaviorConfig::default(),
-        }
-    }
-}
-
 impl Config {
     pub fn load() -> Result<Self> {
         let config_path = Self::config_path()?;
-        
+
         if !config_path.exists() {
-            info!("Config file not found, creating default at {:?}", config_path);
+            info!(
+                "Config file not found, creating default at {:?}",
+                config_path
+            );
             let config = Self::default();
             config.save()?;
             return Ok(config);
         }
-        
-        let content = std::fs::read_to_string(&config_path)
-            .context("Failed to read config file")?;
-        
-        let config: Self = toml::from_str(&content)
-            .context("Failed to parse config file")?;
-        
+
+        let content =
+            std::fs::read_to_string(&config_path).context("Failed to read config file")?;
+
+        let config: Self = toml::from_str(&content).context("Failed to parse config file")?;
+
         info!("Loaded config from {:?}", config_path);
         Ok(config)
     }
-    
+
     pub fn save(&self) -> Result<()> {
         let config_path = Self::config_path()?;
-        
+
         if let Some(parent) = config_path.parent() {
-            std::fs::create_dir_all(parent)
-                .context("Failed to create config directory")?;
+            std::fs::create_dir_all(parent).context("Failed to create config directory")?;
         }
-        
-        let content = toml::to_string_pretty(self)
-            .context("Failed to serialize config")?;
-        
-        std::fs::write(&config_path, content)
-            .context("Failed to write config file")?;
-        
+
+        let content = toml::to_string_pretty(self).context("Failed to serialize config")?;
+
+        std::fs::write(&config_path, content).context("Failed to write config file")?;
+
         Ok(())
     }
-    
+
     fn config_path() -> Result<PathBuf> {
-        let config_dir = dirs::config_dir()
-            .context("Failed to determine config directory")?;
-        
+        let config_dir = dirs::config_dir().context("Failed to determine config directory")?;
+
         Ok(config_dir.join("chezwizper").join("config.toml"))
     }
 }

@@ -10,7 +10,7 @@ use serde_json::{json, Value};
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use tower::ServiceBuilder;
-use tracing::{info, error};
+use tracing::{error, info};
 
 #[derive(Clone)]
 pub enum ApiCommand {
@@ -35,7 +35,7 @@ impl ApiServer {
             state: AppState { tx, recording },
         }
     }
-    
+
     pub async fn start(self) -> Result<()> {
         let app = Router::new()
             .route("/", get(status))
@@ -43,17 +43,16 @@ impl ApiServer {
             .route("/status", get(recording_status))
             .layer(ServiceBuilder::new())
             .with_state(self.state);
-        
-        let listener = tokio::net::TcpListener::bind(&format!("127.0.0.1:{}", self.port))
-            .await?;
-        
+
+        let listener = tokio::net::TcpListener::bind(&format!("127.0.0.1:{}", self.port)).await?;
+
         info!("API server listening on http://127.0.0.1:{}", self.port);
         info!("Endpoints:");
         info!("  POST /toggle - Toggle recording");
         info!("  GET /status  - Get recording status");
-        
+
         axum::serve(listener, app).await?;
-        
+
         Ok(())
     }
 }

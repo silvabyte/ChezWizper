@@ -4,14 +4,17 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 
 ## Available Documentation
 
+### Installation & Setup
+
+- [Installation Guide](./installation.md) - Complete installation instructions for all platforms
+- [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
+
 ### Configuration Guides
 
 - [Audio Configuration](./audio-configuration.md) - Configure audio input devices, sampling settings, and UX sound feedback
-- [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
 
 ### Coming Soon
 
-- Installation Guide - Detailed installation instructions for different platforms
 - Whisper Models Guide - Choosing and configuring different Whisper models
 - Keyboard Shortcuts - Setting up custom keybindings
 - Troubleshooting Guide - Common issues and solutions
