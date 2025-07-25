@@ -7,9 +7,15 @@ ChezWizper supports multiple methods for automatically injecting transcribed tex
 ChezWizper automatically detects the best available text injection method based on:
 
 1. **User preference** (if specified in config)
-2. **Available tools** on your system
+2. **Available tools** on your system  
 3. **Desktop environment** (X11 vs Wayland)
-4. **Distribution-specific** considerations
+
+The detection priority is:
+- If user specifies a method in config, try that first (with fallback if it fails)
+- Otherwise, try ydotool (most reliable on Wayland)
+- On Wayland systems with wl-copy available, prefer clipboard method
+- Try wtype (may fall back to clipboard if it fails)
+- Final fallback to clipboard-only mode
 
 ## Supported Methods
 
@@ -48,7 +54,7 @@ input_method = "ydotool"
 
 **Best for**: Sway and some other Wayland compositors
 
-**Note**: Does NOT work with KDE Plasma or GNOME due to security restrictions.
+**Note**: Does NOT work reliably with KDE Plasma or GNOME due to security restrictions. ChezWizper will automatically fall back to clipboard paste if wtype fails.
 
 **Installation**:
 ```bash
@@ -74,7 +80,7 @@ input_method = "wtype"
 **Best for**: Any environment where direct injection fails
 
 **Requirements**: 
-- **Wayland**: `wl-copy` (usually included with `wl-clipboard`)
+- **Wayland**: `wl-copy` and `wl-paste` (from `wl-clipboard`)
 - **X11**: `xclip` or `xsel`
 
 **Installation**:
@@ -90,8 +96,11 @@ sudo apt install xclip xsel     # Ubuntu/Debian
 
 **How it works**:
 1. Copies text to system clipboard
-2. Simulates Ctrl+V keypress to paste
-3. Falls back to manual paste if automation fails
+2. Verifies clipboard content was set correctly (with retry)
+3. Simulates Ctrl+V keypress to paste using available tools (ydotool, wtype, or xdotool)
+4. If paste simulation fails, text remains in clipboard for manual paste
+
+**Note**: ChezWizper automatically falls back to this method if direct text injection (ydotool/wtype) fails.
 
 ## Distribution-Specific Notes
 
@@ -175,7 +184,9 @@ input_method = "ydotool"
 ### Force clipboard mode
 ```toml
 [wayland]
-input_method = "clipboard"  # Not a real method name, will fall back to clipboard
+# To force clipboard-only mode, set an invalid method name
+# or simply don't install ydotool/wtype
+input_method = "clipboard"  # Will fall back to clipboard
 ```
 
 ### Disable auto-paste

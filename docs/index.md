@@ -7,6 +7,7 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 ### Configuration Guides
 
 - [Audio Configuration](./audio-configuration.md) - Configure audio input devices, sampling settings, and UX sound feedback
+- [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
 
 ### Coming Soon
 

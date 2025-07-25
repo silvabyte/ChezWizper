@@ -14,6 +14,43 @@ enum InjectionMethod {
     Clipboard,
 }
 
+#[derive(Debug)]
+struct ClipboardBackend {
+    name: &'static str,
+    copy_cmd: &'static str,
+    copy_args: &'static [&'static str],
+    read_cmd: &'static str,
+    read_args: &'static [&'static str],
+    use_stdin: bool,
+}
+
+const CLIPBOARD_BACKENDS: &[ClipboardBackend] = &[
+    ClipboardBackend {
+        name: "wl-copy",
+        copy_cmd: "wl-copy",
+        copy_args: &[],
+        read_cmd: "wl-paste", 
+        read_args: &["--no-newline"],
+        use_stdin: true,
+    },
+    ClipboardBackend {
+        name: "xclip",
+        copy_cmd: "xclip",
+        copy_args: &["-selection", "clipboard"],
+        read_cmd: "xclip",
+        read_args: &["-selection", "clipboard", "-out"],
+        use_stdin: true,
+    },
+    ClipboardBackend {
+        name: "xsel",
+        copy_cmd: "xsel",
+        copy_args: &["--clipboard", "--input"],
+        read_cmd: "xsel",
+        read_args: &["--clipboard", "--output"],
+        use_stdin: true,
+    },
+];
+
 impl TextInjector {
     pub fn new(preferred: Option<&str>) -> Result<Self> {
         match preferred {
@@ -76,24 +113,24 @@ impl TextInjector {
         
         match self.method {
             InjectionMethod::Wtype => {
-                // Try direct injection first, fall back to clipboard on failure
-                if let Err(e) = self.inject_with_wtype(text) {
-                    warn!("wtype direct injection failed: {}, falling back to clipboard paste", e);
-                    self.inject_with_clipboard_paste(text).await
-                } else {
-                    Ok(())
-                }
+                self.try_inject_with_fallback(text, |t| self.inject_with_wtype(t), "wtype").await
             }
             InjectionMethod::Ydotool => {
-                // Try direct injection first, fall back to clipboard on failure  
-                if let Err(e) = self.inject_with_ydotool(text) {
-                    warn!("ydotool direct injection failed: {}, falling back to clipboard paste", e);
-                    self.inject_with_clipboard_paste(text).await
-                } else {
-                    Ok(())
-                }
+                self.try_inject_with_fallback(text, |t| self.inject_with_ydotool(t), "ydotool").await
             }
             InjectionMethod::Clipboard => self.inject_with_clipboard_paste(text).await,
+        }
+    }
+    
+    async fn try_inject_with_fallback<F>(&self, text: &str, inject_fn: F, method_name: &str) -> Result<()> 
+    where
+        F: FnOnce(&str) -> Result<()>
+    {
+        if let Err(e) = inject_fn(text) {
+            warn!("{} direct injection failed: {}, falling back to clipboard paste", method_name, e);
+            self.inject_with_clipboard_paste(text).await
+        } else {
+            Ok(())
         }
     }
     
@@ -156,67 +193,99 @@ impl TextInjector {
     async fn inject_with_clipboard_paste(&self, text: &str) -> Result<()> {
         info!("Using clipboard paste method for text injection");
         
-        // Step 1: Copy text to clipboard
-        self.copy_to_clipboard(text).await?;
+        // Copy text to clipboard with verification and retry
+        self.copy_to_clipboard_with_verify(text).await?;
         
-        // Step 2: Small delay to ensure clipboard is updated
-        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
-        // Step 3: Simulate paste shortcut
+        // Simulate paste shortcut
         self.simulate_paste().await
+    }
+    
+    async fn copy_to_clipboard_with_verify(&self, text: &str) -> Result<()> {
+        let mut delay_ms = 50;
+        let max_total_ms = 1000;
+        let mut total_ms = 0;
+        
+        loop {
+            // Try to copy
+            self.copy_to_clipboard(text).await?;
+            
+            // Small initial delay to let clipboard settle
+            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+            
+            // Verify it worked
+            if let Ok(clipboard_content) = self.read_clipboard().await {
+                if clipboard_content.trim() == text.trim() {
+                    debug!("Clipboard verified after {}ms", total_ms);
+                    return Ok(());
+                }
+            }
+            
+            // Check timeout
+            if total_ms >= max_total_ms {
+                warn!("Clipboard verification failed after {}ms, proceeding anyway", total_ms);
+                return Ok(());
+            }
+            
+            // Exponential backoff
+            tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+            total_ms += delay_ms;
+            delay_ms = (delay_ms * 2).min(200); // Cap individual delay at 200ms
+        }
+    }
+    
+    async fn read_clipboard(&self) -> Result<String> {
+        for backend in CLIPBOARD_BACKENDS {
+            if which(backend.read_cmd).is_err() {
+                continue;
+            }
+            
+            if let Ok(output) = Command::new(backend.read_cmd)
+                .args(backend.read_args)
+                .output()
+            {
+                if output.status.success() {
+                    return Ok(String::from_utf8_lossy(&output.stdout).to_string());
+                }
+            }
+        }
+        
+        Err(anyhow::anyhow!("Failed to read clipboard - no working backend found"))
     }
     
     async fn copy_to_clipboard(&self, text: &str) -> Result<()> {
         use std::io::Write;
         
-        // Try Wayland clipboard tools first
-        if let Ok(mut child) = Command::new("wl-copy")
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-        {
-            if let Some(stdin) = child.stdin.as_mut() {
-                stdin.write_all(text.as_bytes())?;
+        for backend in CLIPBOARD_BACKENDS {
+            if which(backend.copy_cmd).is_err() {
+                continue;
             }
-            let status = child.wait()?;
-            if status.success() {
-                debug!("Text copied to clipboard with wl-copy");
-                return Ok(());
+            
+            let mut cmd = Command::new(backend.copy_cmd);
+            cmd.args(backend.copy_args);
+            
+            if backend.use_stdin {
+                cmd.stdin(std::process::Stdio::piped());
             }
-        }
-        
-        // Fallback to X11 clipboard tools
-        if let Ok(mut child) = Command::new("xclip")
-            .args(["-selection", "clipboard"])
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-        {
-            if let Some(stdin) = child.stdin.as_mut() {
-                stdin.write_all(text.as_bytes())?;
-            }
-            let status = child.wait()?;
-            if status.success() {
-                debug!("Text copied to clipboard with xclip");
-                return Ok(());
-            }
-        }
-        
-        // Try xsel as another X11 fallback
-        if let Ok(mut child) = Command::new("xsel")
-            .args(["--clipboard", "--input"])
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-        {
-            if let Some(stdin) = child.stdin.as_mut() {
-                stdin.write_all(text.as_bytes())?;
-            }
-            let status = child.wait()?;
-            if status.success() {
-                debug!("Text copied to clipboard with xsel");
-                return Ok(());
+            
+            if let Ok(mut child) = cmd.spawn() {
+                if backend.use_stdin {
+                    if let Some(stdin) = child.stdin.as_mut() {
+                        if stdin.write_all(text.as_bytes()).is_err() {
+                            continue;
+                        }
+                    }
+                }
+                
+                if let Ok(status) = child.wait() {
+                    if status.success() {
+                        debug!("Text copied to clipboard with {}", backend.name);
+                        return Ok(());
+                    }
+                }
             }
         }
         
-        Err(anyhow::anyhow!("No clipboard tool available (tried wl-copy, xclip, xsel)"))
+        Err(anyhow::anyhow!("No clipboard tool available"))
     }
     
     async fn simulate_paste(&self) -> Result<()> {
