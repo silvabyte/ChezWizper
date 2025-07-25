@@ -358,7 +358,7 @@ echo
 print_warning "Next steps:"
 echo
 printf "1. Start ChezWizper service:\n"
-printf "   ${GREEN}systemctl --user enable --now chezwizper.service${NC}\n"
+printf "   ${GREEN}make start${NC}\n"
 echo
 printf "2. Add this keybind to your Hyprland config (~/.config/hypr/hyprland.conf):\n"
 printf "   ${GREEN}bind = SUPER, R, exec, curl -X POST http://127.0.0.1:3737/toggle${NC}\n"

@@ -1,4 +1,4 @@
-.PHONY: help build release check test clean install run logs restart stop status update update-all lint fmt fix
+.PHONY: help build release check test clean install run logs start restart stop status update update-all lint fmt fix
 
 # Default target
 help:
@@ -14,6 +14,7 @@ help:
 	@echo ""
 	@echo "  make install  - Install ChezWizper (Arch Linux)"
 	@echo "  make run      - Run ChezWizper directly"
+	@echo "  make start    - Enable and start service"
 	@echo "  make logs     - Show service logs"
 	@echo "  make restart  - Restart service"
 	@echo "  make stop     - Stop service"
@@ -57,6 +58,10 @@ run:
 
 logs:
 	journalctl --user -u chezwizper.service -f
+
+start:
+	systemctl --user enable --now chezwizper.service
+	@echo "✓ Service enabled and started"
 
 restart:
 	systemctl --user restart chezwizper.service

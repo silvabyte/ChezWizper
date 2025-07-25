@@ -24,6 +24,7 @@ make release    # Build optimized release
 make test       # Run tests
 make lint       # Run clippy linter
 make fmt        # Check formatting
+make start      # Enable and start service
 make logs       # Show service logs
 make status     # Check service status
 ```

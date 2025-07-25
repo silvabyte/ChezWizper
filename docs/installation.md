@@ -31,7 +31,7 @@ make install -- --rebuild       # Force rebuild ChezWizper
 ```
 
 **Post-installation steps:**
-1. `systemctl --user enable --now chezwizper.service`
+1. `make start` - Enable and start the service
 2. Add to Hyprland config: `bind = SUPER, R, exec, curl -X POST http://127.0.0.1:3737/toggle`
 
 ## Manual Installation

@@ -15,7 +15,7 @@ make install
 This automatically installs dependencies, builds ChezWizper with optimized Whisper, sets up services, and configures keybinds.
 
 **After installation:**
-1. Start the service: `systemctl --user enable --now chezwizper.service`
+1. Start the service: `make start`
 2. Add to Hyprland config: `bind = SUPER, R, exec, curl -X POST http://127.0.0.1:3737/toggle`
 3. Press Super+R to start recording!
 
@@ -48,6 +48,7 @@ make lint       # Run clippy linter
 make fmt        # Check formatting
 make fix        # Fix formatting and simple issues
 
+make start      # Enable and start service
 make logs       # Show service logs
 make restart    # Restart service
 make status     # Check service status
