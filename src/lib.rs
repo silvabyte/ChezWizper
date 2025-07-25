@@ -1,0 +1,9 @@
+pub mod whisper;
+pub mod config;
+pub mod audio;
+pub mod api;
+pub mod clipboard;
+pub mod normalizer;
+pub mod text_injection;
+pub mod transcription;
+pub mod ui;

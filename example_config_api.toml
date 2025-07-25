@@ -1,0 +1,27 @@
+[audio]
+device = "default"
+sample_rate = 16000
+channels = 1
+
+[whisper]
+model = "whisper-1"  # OpenAI API model
+language = "en"
+use_api = true
+api_endpoint = "https://api.openai.com/v1/audio/transcriptions"
+# Set OPENAI_API_KEY environment variable
+
+[ui]
+indicator_position = "top-right"
+indicator_size = 20
+show_notifications = true
+layer_shell_anchor = "top | right"
+layer_shell_margin = 10
+
+[wayland]
+input_method = "wtype"
+use_hyprland_ipc = true
+
+[behavior]
+auto_paste = true
+preserve_clipboard = false
+delete_audio_files = true
