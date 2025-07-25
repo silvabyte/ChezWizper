@@ -377,8 +377,8 @@ printf "   ${GREEN}make restart${NC}   # Restart the service\n"
 printf "   ${GREEN}make build${NC}     # Rebuild ChezWizper\n"
 echo
 printf "6. Update ChezWizper anytime with:\n"
-printf "   ${GREEN}chezwizper-update${NC}               # Update ChezWizper only\n"
-printf "   ${GREEN}chezwizper-update --whisper${NC}     # Update both ChezWizper and whisper.cpp\n"
-printf "   ${GREEN}chezwizper-update --check${NC}       # Check for available updates\n"
+printf "   ${GREEN}make update${NC}     # Update ChezWizper only\n"
+printf "   ${GREEN}make update-all${NC} # Update both ChezWizper and whisper.cpp\n"
+printf "   Note: If 'chezwizper-update' command not found, run: ${GREEN}hash -r${NC}\n"
 echo
 print_success "ChezWizper is ready to use! Press Super+R to start recording."

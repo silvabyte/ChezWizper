@@ -1,4 +1,4 @@
-.PHONY: help build release check test clean install run logs restart stop status lint fmt fix
+.PHONY: help build release check test clean install run logs restart stop status update update-all lint fmt fix
 
 # Default target
 help:
@@ -18,6 +18,9 @@ help:
 	@echo "  make restart  - Restart service"
 	@echo "  make stop     - Stop service"
 	@echo "  make status   - Check service status"
+	@echo ""
+	@echo "  make update   - Update ChezWizper"
+	@echo "  make update-all - Update ChezWizper and Whisper"
 	@echo ""
 	@echo "  make clean    - Clean build artifacts"
 
@@ -66,6 +69,21 @@ stop:
 status:
 	@systemctl --user is-active chezwizper.service >/dev/null 2>&1 && echo "✓ Service is running" || echo "✗ Service is not running"
 	@curl -s http://127.0.0.1:3737/status 2>/dev/null | python3 -m json.tool || echo "✗ API not responding"
+
+# Update commands
+update:
+	@if command -v chezwizper-update >/dev/null 2>&1; then \
+		chezwizper-update; \
+	else \
+		echo "Update command not found. Try: hash -r && chezwizper-update"; \
+	fi
+
+update-all:
+	@if command -v chezwizper-update >/dev/null 2>&1; then \
+		chezwizper-update --whisper; \
+	else \
+		echo "Update command not found. Try: hash -r && chezwizper-update --whisper"; \
+	fi
 
 # Cleanup
 clean:
