@@ -9,7 +9,7 @@ Voice transcription tool for Wayland/Hyprland. Press a keybind to toggle recordi
 ```bash
 git clone https://github.com/silvabyte/ChezWizper.git
 cd ChezWizper
-./scripts/install.sh
+make install
 ```
 
 This automatically installs dependencies, builds ChezWizper with optimized Whisper, sets up services, and configures keybinds.
@@ -36,11 +36,29 @@ For other distributions or custom setups, see the [Installation Guide](./docs/in
 
 Default config at `~/.config/chezwizper/config.toml`. See [Configuration Guide](./docs/audio-configuration.md) for details.
 
+## Development
+
+ChezWizper uses a Makefile for common tasks:
+
+```bash
+make build      # Build debug binary
+make release    # Build optimized release
+make test       # Run tests
+make lint       # Run clippy linter
+make fmt        # Check formatting
+make fix        # Fix formatting and simple issues
+
+make logs       # Show service logs
+make restart    # Restart service
+make status     # Check service status
+make clean      # Clean build artifacts
+```
+
 ## Troubleshooting
 
 - **Recording issues**: Check [Audio Configuration](./docs/audio-configuration.md)
 - **Text injection fails**: See [Text Injection Setup](./docs/text-injection-setup.md)
-- **Service problems**: View logs with `journalctl --user -u chezwizper.service -f`
+- **Service problems**: View logs with `make logs`
 
 ## Updates
 

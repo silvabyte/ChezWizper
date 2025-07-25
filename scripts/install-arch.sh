@@ -366,12 +366,17 @@ printf "   or for Omachy:\n"
 printf "   ${GREEN}bind = SUPER, R, exec, \$terminal -e curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
 echo
 printf "3. Check service status:\n"
-printf "   ${GREEN}systemctl --user status chezwizper.service${NC}\n"
+printf "   ${GREEN}make status${NC}\n"
 echo
 printf "4. View logs if needed:\n"
-printf "   ${GREEN}journalctl --user -u chezwizper.service -f${NC}\n"
+printf "   ${GREEN}make logs${NC}\n"
 echo
-printf "5. Update ChezWizper anytime with:\n"
+printf "5. Common development commands:\n"
+printf "   ${GREEN}make help${NC}      # Show all available commands\n"
+printf "   ${GREEN}make restart${NC}   # Restart the service\n"
+printf "   ${GREEN}make build${NC}     # Rebuild ChezWizper\n"
+echo
+printf "6. Update ChezWizper anytime with:\n"
 printf "   ${GREEN}chezwizper-update${NC}               # Update ChezWizper only\n"
 printf "   ${GREEN}chezwizper-update --whisper${NC}     # Update both ChezWizper and whisper.cpp\n"
 printf "   ${GREEN}chezwizper-update --check${NC}       # Check for available updates\n"

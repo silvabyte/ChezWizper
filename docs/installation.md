@@ -11,7 +11,7 @@ For users running Omarchy on Arch Linux, use the automated installer:
 ```bash
 git clone https://github.com/silvabyte/ChezWizper.git
 cd ChezWizper
-./scripts/install.sh
+make install
 ```
 
 This installer:
@@ -21,6 +21,14 @@ This installer:
 - Creates systemd user service
 - Sets up update mechanism
 - Creates proper configuration
+
+**Installation Options:**
+```bash
+make install              # Normal install with smart detection
+make install -- --clean   # Fresh install from scratch
+make install -- --skip-whisper  # Update only ChezWizper
+make install -- --rebuild       # Force rebuild ChezWizper
+```
 
 **Post-installation steps:**
 1. `systemctl --user enable --now chezwizper.service`
@@ -307,12 +315,13 @@ use_hyprland_ipc = false
 1. **Test service**: `systemctl --user status chezwizper.service`
 2. **Test API**: `curl -X POST http://127.0.0.1:3737/toggle`
 3. **Test recording**: Press your configured keybind
-4. **Check logs**: `journalctl --user -u chezwizper.service -f`
+4. **Check logs**: `make logs`
 
 ## Troubleshooting
 
 ### Service fails to start
-- Check logs: `journalctl --user -u chezwizper.service -e`
+- Check logs: `make logs` or `journalctl --user -u chezwizper.service -e`
+- Check status: `make status`
 - Verify binary path: `which chezwizper`
 - Test config: `chezwizper --verbose`
 
