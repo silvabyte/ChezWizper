@@ -80,6 +80,8 @@ impl Default for WhisperConfig {
             language: "en".to_string(),
             command_path: None,
             model_path: None,
+            use_api: false,
+            api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
         }
     }
 }
@@ -146,6 +148,7 @@ impl Default for Config {
             behavior: BehaviorConfig {
                 auto_paste: true,
                 preserve_clipboard: false,
+                audio_feedback: true,
                 delete_audio_files: true,
             },
         }
