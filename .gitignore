@@ -16,3 +16,9 @@ Thumbs.db
 # Whispy specific
 *.wav
 /tmp/
+
+# Environment and secrets
+.env
+.env.local
+*.key
+api_key.txt

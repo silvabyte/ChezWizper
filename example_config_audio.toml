@@ -4,11 +4,8 @@ sample_rate = 16000
 channels = 1
 
 [whisper]
-model = "base"  # CLI model
+model = "base"
 language = "en"
-use_api = false  # Use local CLI instead of API
-# command_path = "/path/to/whisper"  # Optional custom path
-# model_path = "/path/to/model.bin"  # Optional custom model path
 
 [ui]
 indicator_position = "top-right"
@@ -24,9 +21,5 @@ use_hyprland_ipc = true
 [behavior]
 auto_paste = true
 preserve_clipboard = false
-<<<<<<< HEAD
 delete_audio_files = true
-audio_feedback = true  # Play sounds for recording start/stop
-=======
-delete_audio_files = true
->>>>>>> feature/openai-api-integration
+audio_feedback = true  # Play distinctive beep tones for start/stop/complete

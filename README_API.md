@@ -87,6 +87,7 @@ For heavy usage, consider:
 
 ## Testing
 
+<<<<<<< HEAD
 Test with configuration file:
 
 ```bash
@@ -97,6 +98,18 @@ Test direct file transcription:
 
 ```bash
 ./target/release/transcribe_file your_audio.wav
+=======
+Test API integration without audio recording:
+
+```bash
+OPENAI_API_KEY="your-key" cargo run --bin test_api
+```
+
+Test with configuration file:
+
+```bash
+OPENAI_API_KEY="your-key" cargo run --bin chezwizper -- --config example_config_api.toml
+>>>>>>> feature/openai-api-integration
 ```
 
 ## Security

@@ -11,6 +11,10 @@ name = "chezwizper"
 path = "src/main.rs"
 
 [[bin]]
+name = "test_api"
+path = "src/bin/test_api.rs"
+
+[[bin]]
 name = "transcribe_file"
 path = "src/bin/transcribe_file.rs"
 

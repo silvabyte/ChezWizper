@@ -190,5 +190,4 @@ for i in range(samples):
         
         Err(anyhow::anyhow!("No tone generation method available"))
     }
-    
 }
