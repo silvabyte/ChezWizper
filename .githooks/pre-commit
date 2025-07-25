@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+
+echo "🦀 Running pre-commit checks..."
+
+# Check if we're in the right directory
+if [ ! -f "Cargo.toml" ]; then
+    echo "Error: Not in a Rust project root"
+    exit 1
+fi
+
+# Run formatting check
+echo "📐 Checking formatting..."
+if ! cargo fmt -- --check; then
+    echo "❌ Formatting issues found. Run 'make fmt' or 'cargo fmt' to fix."
+    exit 1
+fi
+
+# Run build
+echo "🔨 Building project..."
+if ! cargo build --release; then
+    echo "❌ Build failed"
+    exit 1
+fi
+
+# Run clippy
+echo "📎 Running clippy..."
+if ! cargo clippy --all-targets --all-features -- -D warnings; then
+    echo "❌ Clippy found issues"
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
