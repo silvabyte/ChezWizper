@@ -5,7 +5,15 @@ use tracing::{debug, info, error, warn};
 use which::which;
 
 mod api_client;
+mod groq_client;
 use api_client::OpenAIClient;
+use groq_client::GroqClient;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ApiProvider {
+    OpenAI,
+    Groq,
+}
 
 pub struct WhisperTranscriber {
     command_path: Option<PathBuf>,
@@ -14,20 +22,34 @@ pub struct WhisperTranscriber {
     language: String,
     pub is_openai_whisper: bool,
     pub use_api: bool,
-    api_client: Option<OpenAIClient>,
+    pub provider: ApiProvider,
+    openai_client: Option<OpenAIClient>,
+    groq_client: Option<GroqClient>,
 }
 
 impl WhisperTranscriber {
-    pub fn new(custom_path: Option<String>, use_api: bool, api_endpoint: Option<String>) -> Result<Self> {
-        let (command_path, is_openai_whisper, api_client) = if use_api {
-            // API mode - get API key from environment
-            let api_key = std::env::var("OPENAI_API_KEY")
-                .context("OPENAI_API_KEY environment variable is required when use_api is true")?;
-            
-            let client = OpenAIClient::new(api_key, api_endpoint)?;
-            info!("Using OpenAI API for transcription");
-            
-            (None, false, Some(client))
+    pub fn new(custom_path: Option<String>, use_api: bool, provider: ApiProvider, api_endpoint: Option<String>) -> Result<Self> {
+        let (command_path, is_openai_whisper, openai_client, groq_client) = if use_api {
+            match provider {
+                ApiProvider::OpenAI => {
+                    let api_key = std::env::var("OPENAI_API_KEY")
+                        .context("OPENAI_API_KEY environment variable is required when using OpenAI API")?;
+                    
+                    let client = OpenAIClient::new(api_key, api_endpoint)?;
+                    info!("Using OpenAI API for transcription");
+                    
+                    (None, false, Some(client), None)
+                }
+                ApiProvider::Groq => {
+                    let api_key = std::env::var("GROQ_API_KEY")
+                        .context("GROQ_API_KEY environment variable is required when using Groq API")?;
+                    
+                    let client = GroqClient::new(api_key, api_endpoint)?;
+                    info!("Using Groq API for transcription");
+                    
+                    (None, false, None, Some(client))
+                }
+            }
         } else {
             // CLI mode
             let command_path = if let Some(path) = custom_path {
@@ -63,17 +85,28 @@ impl WhisperTranscriber {
                 info!("Detected whisper.cpp or other implementation");
             }
             
-            (Some(command_path), is_openai, None)
+            (Some(command_path), is_openai, None, None)
+        };
+        
+        let default_model = if use_api {
+            match provider {
+                ApiProvider::OpenAI => "whisper-1".to_string(),
+                ApiProvider::Groq => "whisper-large-v3-turbo".to_string(),
+            }
+        } else {
+            "base".to_string()
         };
         
         Ok(Self {
             command_path,
-            model: if use_api { "whisper-1".to_string() } else { "base".to_string() },
+            model: default_model,
             model_path: None,
             language: "en".to_string(),
             is_openai_whisper,
             use_api,
-            api_client,
+            provider,
+            openai_client,
+            groq_client,
         })
     }
     
@@ -105,10 +138,18 @@ impl WhisperTranscriber {
     }
     
     async fn transcribe_api(&self, audio_path: &PathBuf) -> Result<String> {
-        let client = self.api_client.as_ref()
-            .context("API client not initialized")?;
-        
-        client.transcribe(audio_path, &self.model, &self.language).await
+        match self.provider {
+            ApiProvider::OpenAI => {
+                let client = self.openai_client.as_ref()
+                    .context("OpenAI client not initialized")?;
+                client.transcribe(audio_path, &self.model, &self.language).await
+            }
+            ApiProvider::Groq => {
+                let client = self.groq_client.as_ref()
+                    .context("Groq client not initialized")?;
+                client.transcribe(audio_path, &self.model, &self.language).await
+            }
+        }
     }
     
     async fn transcribe_openai_whisper(&self, audio_path: &PathBuf) -> Result<String> {

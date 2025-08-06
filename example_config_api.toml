@@ -4,11 +4,13 @@ sample_rate = 16000
 channels = 1
 
 [whisper]
-model = "whisper-1"  # OpenAI API model
+model = "whisper-large-v3-turbo"  # Groq API model (also supports whisper-large-v3)
 language = "en"
 use_api = true
-api_endpoint = "https://api.openai.com/v1/audio/transcriptions"
-# Set OPENAI_API_KEY environment variable
+api_provider = "groq"  # Options: "groq" (default, faster & cheaper) or "openai"
+api_endpoint = "https://api.groq.com/openai/v1/audio/transcriptions"
+# Set GROQ_API_KEY environment variable for Groq
+# For OpenAI: set api_provider = "openai" and OPENAI_API_KEY environment variable
 
 [ui]
 indicator_position = "top-right"

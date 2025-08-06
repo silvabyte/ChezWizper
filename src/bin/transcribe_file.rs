@@ -1,18 +1,21 @@
 use anyhow::Result;
-use chezwizper::whisper::WhisperTranscriber;
+use chezwizper::whisper::{WhisperTranscriber, ApiProvider};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 use clap::Parser;
 
 #[derive(Parser)]
 #[command(name = "transcribe_file")]
-#[command(about = "Transcribe an audio file using ChezWizper's OpenAI API integration")]
+#[command(about = "Transcribe an audio file using ChezWizper's API integration")]
 struct Args {
     #[arg(help = "Path to the audio file to transcribe")]
     audio_file: String,
     
-    #[arg(short, long, default_value = "whisper-1")]
+    #[arg(short, long, default_value = "whisper-large-v3-turbo")]
     model: String,
+    
+    #[arg(short, long, default_value = "groq", help = "API provider (groq or openai)")]
+    provider: String,
     
     #[arg(short, long, default_value = "en")]
     language: String,
@@ -26,6 +29,9 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load .env file if it exists
+    let _ = dotenv::dotenv();
+    
     let args = Args::parse();
     
     // Initialize logging
@@ -47,20 +53,39 @@ async fn main() -> Result<()> {
     
     if !args.cli {
         // API mode
-        if std::env::var("OPENAI_API_KEY").is_err() {
-            eprintln!("❌ Error: OPENAI_API_KEY environment variable not set");
-            eprintln!("   Set it with: export OPENAI_API_KEY='sk-your-key'");
+        let api_key_var = match args.provider.to_lowercase().as_str() {
+            "groq" => "GROQ_API_KEY",
+            "openai" => "OPENAI_API_KEY",
+            _ => "GROQ_API_KEY",
+        };
+        
+        if std::env::var(api_key_var).is_err() {
+            eprintln!("❌ Error: {} environment variable not set", api_key_var);
+            eprintln!("   Set it with: export {}='your-key'", api_key_var);
             std::process::exit(1);
         }
-        println!("🌐 Using OpenAI API (model: {})", args.model);
+        println!("🌐 Using {} API (model: {})", args.provider, args.model);
     } else {
         println!("💻 Using local CLI mode");
     }
     
+    let api_provider = match args.provider.to_lowercase().as_str() {
+        "groq" => ApiProvider::Groq,
+        "openai" => ApiProvider::OpenAI,
+        _ => ApiProvider::Groq,
+    };
+    
+    let endpoint = match args.provider.to_lowercase().as_str() {
+        "groq" => Some("https://api.groq.com/openai/v1/audio/transcriptions".to_string()),
+        "openai" => Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
+        _ => Some("https://api.groq.com/openai/v1/audio/transcriptions".to_string()),
+    };
+    
     let transcriber = WhisperTranscriber::new(
         None,
         !args.cli, // use_api = !cli
-        Some("https://api.openai.com/v1/audio/transcriptions".to_string())
+        api_provider,
+        endpoint
     )?
     .with_model(args.model)
     .with_language(args.language);

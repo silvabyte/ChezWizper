@@ -26,6 +26,7 @@ pub struct WhisperConfig {
     pub command_path: Option<String>,
     pub model_path: Option<String>,
     pub use_api: bool,
+    pub api_provider: String,
     pub api_endpoint: Option<String>,
 }
 
@@ -61,12 +62,13 @@ impl Default for Config {
                 channels: 1,
             },
             whisper: WhisperConfig {
-                model: "base".to_string(),
+                model: "whisper-large-v3-turbo".to_string(),
                 language: "en".to_string(),
                 command_path: None,
                 model_path: None,
-                use_api: false,
-                api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
+                use_api: true,
+                api_provider: "groq".to_string(),
+                api_endpoint: Some("https://api.groq.com/openai/v1/audio/transcriptions".to_string()),
             },
             ui: UiConfig {
                 indicator_position: "top-right".to_string(),

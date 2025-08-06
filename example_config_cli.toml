@@ -7,6 +7,7 @@ channels = 1
 model = "base"  # CLI model
 language = "en"
 use_api = false  # Use local CLI instead of API
+api_provider = "groq"  # Not used in CLI mode, but required for config
 # command_path = "/path/to/whisper"  # Optional custom path
 # model_path = "/path/to/model.bin"  # Optional custom model path
 
@@ -24,9 +25,5 @@ use_hyprland_ipc = true
 [behavior]
 auto_paste = true
 preserve_clipboard = false
-<<<<<<< HEAD
 delete_audio_files = true
 audio_feedback = true  # Play sounds for recording start/stop
-=======
-delete_audio_files = true
->>>>>>> feature/openai-api-integration

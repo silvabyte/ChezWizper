@@ -23,7 +23,7 @@ use crate::config::Config;
 use crate::text_injection::TextInjector;
 use crate::transcription::TranscriptionService;
 use crate::ui::Indicator;
-use crate::whisper::WhisperTranscriber;
+use crate::whisper::{WhisperTranscriber, ApiProvider};
 
 #[derive(Parser)]
 #[command(name = "chezwizper")]
@@ -56,6 +56,9 @@ async fn main() -> Result<()> {
     
     info!("Starting ChezWizper");
     
+    // Load .env file if it exists (for local development)
+    load_env_files();
+    
     // Load configuration
     let config = if let Some(config_path) = args.config {
         Config::load_from_path(config_path)?
@@ -69,9 +72,16 @@ async fn main() -> Result<()> {
     let audio_recorder = AudioStreamManager::new()?;
     
     // Build whisper transcriber
+    let api_provider = match config.whisper.api_provider.to_lowercase().as_str() {
+        "groq" => ApiProvider::Groq,
+        "openai" => ApiProvider::OpenAI,
+        _ => ApiProvider::Groq, // Default to Groq
+    };
+    
     let whisper = WhisperTranscriber::new(
         config.whisper.command_path.clone(),
         config.whisper.use_api,
+        api_provider,
         config.whisper.api_endpoint.clone()
     )?
         .with_model(config.whisper.model.clone())
@@ -199,4 +209,31 @@ async fn main() -> Result<()> {
     }
     
     Ok(())
+}
+
+fn load_env_files() {
+    // Try to load .env files from multiple locations
+    let home_env = std::env::var("HOME").unwrap_or_default() + "/.config/chezwizper/.env";
+    let xdg_env = dirs::config_dir()
+        .map(|d| d.join("chezwizper").join(".env"))
+        .and_then(|p| p.to_str().map(|s| s.to_string()))
+        .unwrap_or_default();
+        
+    let locations = [
+        ".env",                    // Current directory
+        &home_env,                 // Config directory
+        &xdg_env,                  // XDG config dir
+    ];
+    
+    for location in &locations {
+        if !location.is_empty() && std::path::Path::new(location).exists() {
+            match dotenv::from_path(location) {
+                Ok(_) => {
+                    info!("Loaded environment variables from: {}", location);
+                    break; // Only load the first one found
+                }
+                Err(_) => continue,
+            }
+        }
+    }
 }

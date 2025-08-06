@@ -4,11 +4,12 @@ sample_rate = 16000
 channels = 1
 
 [whisper]
-model = "whisper-large-v3-turbo"
+model = "whisper-1"  # OpenAI API model
 language = "en"
 use_api = true
-api_provider = "groq"
-api_endpoint = "https://api.groq.com/openai/v1/audio/transcriptions"
+api_provider = "openai"  # Use OpenAI instead of Groq
+api_endpoint = "https://api.openai.com/v1/audio/transcriptions"
+# Set OPENAI_API_KEY environment variable
 
 [ui]
 indicator_position = "top-right"
@@ -25,4 +26,4 @@ use_hyprland_ipc = true
 auto_paste = true
 preserve_clipboard = false
 delete_audio_files = true
-audio_feedback = true  # Play distinctive beep tones for start/stop/complete
+audio_feedback = true  # Play sounds for recording start/stop
