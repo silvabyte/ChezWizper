@@ -12,6 +12,8 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 
 ### Development
 
+- [**Adding Providers**](./adding-providers.md) - Complete guide for developers to add new transcription providers
+
 ChezWizper includes a Makefile for common development tasks:
 
 ```bash
