@@ -26,9 +26,9 @@ impl WhisperTranscriber {
 
         let provider: Box<dyn TranscriptionProvider> = match provider_name {
             "openai-api" => {
-                let api_key = std::env::var("OPENAI_API_KEY").context(
-                    "OPENAI_API_KEY environment variable is required for OpenAI API provider",
-                )?;
+                let api_key = config
+                    .api_key
+                    .context("api_key is required for OpenAI API provider")?;
 
                 let model = config.model.unwrap_or_else(|| "whisper-1".to_string());
                 Box::new(OpenAIProvider::new(api_key, config.api_endpoint, model)?)
@@ -59,14 +59,8 @@ impl WhisperTranscriber {
     fn auto_detect_provider(custom_path: Option<String>) -> Result<Box<dyn TranscriptionProvider>> {
         info!("Auto-detecting transcription provider...");
 
-        if let Ok(api_key) = std::env::var("OPENAI_API_KEY") {
-            if !api_key.is_empty() {
-                if let Ok(provider) = OpenAIProvider::new(api_key, None, "whisper-1".to_string()) {
-                    info!("Auto-detected: OpenAI API (OPENAI_API_KEY found)");
-                    return Ok(Box::new(provider));
-                }
-            }
-        }
+        // Note: OpenAI API requires explicit configuration with api_key
+        // Auto-detection skips API providers that need authentication
 
         if let Ok(provider) = OpenAIWhisperCliProvider::new(custom_path.clone(), "base".to_string())
         {
@@ -84,7 +78,7 @@ impl WhisperTranscriber {
         }
 
         Err(anyhow::anyhow!(
-            "No transcription provider available. Install whisper-cpp, openai-whisper, or set OPENAI_API_KEY"
+            "No transcription provider available. Install whisper-cpp, openai-whisper, or configure OpenAI API with api_key"
         ))
     }
 
@@ -111,6 +105,7 @@ pub struct ProviderConfig {
     pub language: Option<String>,
     pub command_path: Option<String>,
     pub api_endpoint: Option<String>,
+    pub api_key: Option<String>,
 }
 
 impl Default for ProviderConfig {
@@ -121,6 +116,7 @@ impl Default for ProviderConfig {
             language: Some("en".to_string()),
             command_path: None,
             api_endpoint: None,
+            api_key: None,
         }
     }
 }

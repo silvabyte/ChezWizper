@@ -5,14 +5,15 @@ channels = 1
 
 [whisper]
 # Auto-detection (recommended) - will use the best available provider:
-# 1. OpenAI API (if OPENAI_API_KEY is set)
-# 2. OpenAI Whisper CLI (if installed) 
-# 3. whisper.cpp (fallback)
+# 1. OpenAI Whisper CLI (if installed) 
+# 2. whisper.cpp (fallback)
+# Note: API providers need explicit configuration with api_key
 model = "base"
 language = "en"
 
 # Explicit provider examples (uncomment to override auto-detection):
-# provider = "openai-api"     # Requires OPENAI_API_KEY environment variable
+# provider = "openai-api"     # OpenAI API provider
+# api_key = "sk-your-key"     # Your OpenAI API key (required for API)
 # model = "whisper-1"         # For OpenAI API
 # api_endpoint = "https://api.openai.com/v1/audio/transcriptions"  # Optional
 

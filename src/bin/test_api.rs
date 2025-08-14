@@ -10,28 +10,24 @@ async fn main() -> Result<()> {
 
     println!("Testing OpenAI API integration...");
 
-    // Test API mode (requires OPENAI_API_KEY environment variable)
-    if std::env::var("OPENAI_API_KEY").is_ok() {
-        println!("✓ OPENAI_API_KEY found in environment");
+    // Test API mode (requires api_key in config)
+    println!("Testing OpenAI API provider...");
 
-        let config = ProviderConfig {
-            model: Some("whisper-1".to_string()),
-            api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
-            language: Some("en".to_string()),
-            ..Default::default()
-        };
-        match WhisperTranscriber::with_provider("openai-api", config) {
-            Ok(_transcriber) => {
-                println!("✓ OpenAI API client initialized successfully");
-                println!("  API client ready for transcription");
-            }
-            Err(e) => {
-                println!("✗ Failed to initialize API client: {e}");
-            }
+    let config = ProviderConfig {
+        model: Some("whisper-1".to_string()),
+        api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
+        language: Some("en".to_string()),
+        api_key: Some("test-api-key".to_string()), // Would normally come from config
+        ..Default::default()
+    };
+    match WhisperTranscriber::with_provider("openai-api", config) {
+        Ok(_transcriber) => {
+            println!("✓ OpenAI API client initialized successfully");
+            println!("  API client ready for transcription");
         }
-    } else {
-        println!("✗ OPENAI_API_KEY not found in environment");
-        println!("  Set OPENAI_API_KEY to test API functionality");
+        Err(e) => {
+            println!("✗ Failed to initialize API client: {e}");
+        }
     }
 
     // Test CLI mode (fallback)

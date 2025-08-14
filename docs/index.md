@@ -8,11 +8,7 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 
 - [Installation Guide](./installation.md) - Complete installation instructions for all platforms
 - [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
-- [Whisper Transcription Setup](./whisper-transcription-setup.md) - Configure speech-to-text providers (OpenAI API, local Whisper)
-
-### Configuration Guides
-
-- [Audio Configuration](./audio-configuration.md) - Configure audio input devices, sampling settings, and UX sound feedback
+- [**Configuration Guide**](./configuration.md) - Complete configuration reference covering all ChezWizper settings including providers, audio, UI, and behavior
 
 ### Development
 

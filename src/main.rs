@@ -75,6 +75,7 @@ async fn main() -> Result<()> {
             language: Some(config.whisper.language.clone()),
             command_path: config.whisper.command_path.clone(),
             api_endpoint: config.whisper.api_endpoint.clone(),
+            api_key: config.whisper.api_key.clone(),
         };
         WhisperTranscriber::with_provider(provider, provider_config)?
     } else {
@@ -85,6 +86,7 @@ async fn main() -> Result<()> {
             language: Some(config.whisper.language.clone()),
             command_path: config.whisper.command_path.clone(),
             api_endpoint: config.whisper.api_endpoint.clone(),
+            api_key: config.whisper.api_key.clone(),
         };
         WhisperTranscriber::auto_detect(provider_config)?
     };

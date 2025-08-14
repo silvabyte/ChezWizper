@@ -30,6 +30,7 @@ pub struct WhisperConfig {
     pub model_path: Option<String>,
     pub api_endpoint: Option<String>,
     pub provider: Option<String>,
+    pub api_key: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -82,6 +83,7 @@ impl Default for WhisperConfig {
             model_path: None,
             api_endpoint: Some("https://api.openai.com/v1/audio/transcriptions".to_string()),
             provider: None,
+            api_key: None,
         }
     }
 }
