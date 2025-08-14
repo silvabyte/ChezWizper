@@ -1,187 +1,122 @@
 use anyhow::{Context, Result};
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
-use tracing::{error, info};
-use which::which;
+use tracing::{info, warn};
+
+mod provider;
+mod providers;
+
+use provider::TranscriptionProvider;
+use providers::{OpenAIProvider, OpenAIWhisperCliProvider, WhisperCppProvider};
 
 pub struct WhisperTranscriber {
-    command_path: PathBuf,
-    model: String,
-    model_path: Option<String>,
+    provider: Box<dyn TranscriptionProvider>,
     language: String,
-    pub is_openai_whisper: bool,
 }
 
 impl WhisperTranscriber {
-    pub fn new(custom_path: Option<String>) -> Result<Self> {
-        let command_path = if let Some(path) = custom_path {
-            let custom_path = PathBuf::from(path);
-            if custom_path.exists() {
-                info!("Using custom whisper path: {:?}", custom_path);
-                custom_path
-            } else {
-                return Err(anyhow::anyhow!(
-                    "Custom whisper path does not exist: {:?}",
-                    custom_path
-                ));
+    pub fn auto_detect(config: ProviderConfig) -> Result<Self> {
+        let language = config.language.unwrap_or_else(|| "en".to_string());
+        let provider = Self::auto_detect_provider(config.command_path)?;
+
+        Ok(Self { provider, language })
+    }
+
+    pub fn with_provider(provider_name: &str, config: ProviderConfig) -> Result<Self> {
+        let language = config.language.clone().unwrap_or_else(|| "en".to_string());
+
+        let provider: Box<dyn TranscriptionProvider> = match provider_name {
+            "openai-api" => {
+                let api_key = config
+                    .api_key
+                    .context("api_key is required for OpenAI API provider")?;
+
+                let model = config.model.unwrap_or_else(|| "whisper-1".to_string());
+                Box::new(OpenAIProvider::new(api_key, config.api_endpoint, model)?)
             }
-        } else {
-            which("whisper")
-                .context("Whisper CLI not found. Please install whisper-cpp or openai-whisper")?
+            "openai-cli" => {
+                let model = config.model.unwrap_or_else(|| "base".to_string());
+                Box::new(OpenAIWhisperCliProvider::new(config.command_path, model)?)
+            }
+            "whisper-cpp" => {
+                let model = config.model.unwrap_or_else(|| "base".to_string());
+                Box::new(WhisperCppProvider::new(
+                    config.command_path,
+                    model,
+                    config.model_path,
+                )?)
+            }
+            _ => {
+                warn!("Unknown provider '{}', using auto-detection", provider_name);
+                Self::auto_detect_provider(config.command_path)?
+            }
         };
 
-        info!("Found whisper at: {:?}", command_path);
+        info!("Using {} for transcription", provider.name());
 
-        // Detect if this is OpenAI whisper by checking help output
-        let help_output = Command::new(&command_path).arg("--help").output();
+        Ok(Self { provider, language })
+    }
 
-        let is_openai = if let Ok(output) = help_output {
-            let help_text = String::from_utf8_lossy(&output.stdout);
-            help_text.contains("--output_format") && help_text.contains("--output_dir")
-        } else {
-            false
-        };
+    fn auto_detect_provider(custom_path: Option<String>) -> Result<Box<dyn TranscriptionProvider>> {
+        info!("Auto-detecting transcription provider...");
 
-        if is_openai {
-            info!("Detected OpenAI Whisper");
-        } else {
-            info!("Detected whisper.cpp or other implementation");
+        // Note: OpenAI API requires explicit configuration with api_key
+        // Auto-detection skips API providers that need authentication
+
+        if let Ok(provider) = OpenAIWhisperCliProvider::new(custom_path.clone(), "base".to_string())
+        {
+            if provider.is_available() {
+                info!("Auto-detected: OpenAI Whisper CLI");
+                return Ok(Box::new(provider));
+            }
         }
 
-        Ok(Self {
-            command_path,
-            model: "base".to_string(),
-            model_path: None,
-            language: "en".to_string(),
-            is_openai_whisper: is_openai,
-        })
-    }
+        if let Ok(provider) = WhisperCppProvider::new(custom_path, "base".to_string(), None) {
+            if provider.is_available() {
+                info!("Auto-detected: whisper.cpp");
+                return Ok(Box::new(provider));
+            }
+        }
 
-    pub fn with_model(mut self, model: String) -> Self {
-        self.model = model;
-        self
-    }
-
-    pub fn with_model_path(mut self, model_path: Option<String>) -> Self {
-        self.model_path = model_path;
-        self
-    }
-
-    pub fn with_language(mut self, language: String) -> Self {
-        self.language = language;
-        self
+        Err(anyhow::anyhow!(
+            "No transcription provider available. Install whisper-cpp, openai-whisper, or configure OpenAI API with api_key"
+        ))
     }
 
     pub async fn transcribe(&self, audio_path: &PathBuf) -> Result<String> {
-        info!("Transcribing audio file: {:?}", audio_path);
-
-        if self.is_openai_whisper {
-            self.transcribe_openai_whisper(audio_path).await
-        } else {
-            self.transcribe_whisper_cpp(audio_path).await
-        }
+        info!(
+            "Transcribing audio file: {:?} with {}",
+            audio_path,
+            self.provider.name()
+        );
+        self.provider
+            .transcribe(audio_path.as_path(), &self.language)
+            .await
     }
 
-    async fn transcribe_openai_whisper(&self, audio_path: &PathBuf) -> Result<String> {
-        info!("Using OpenAI Whisper");
-
-        let output = Command::new(&self.command_path)
-            .arg(audio_path)
-            .arg("--model")
-            .arg(&self.model)
-            .arg("--language")
-            .arg(&self.language)
-            .arg("--output_format")
-            .arg("txt")
-            .arg("--output_dir")
-            .arg("/tmp")
-            .output()
-            .context("Failed to execute whisper command")?;
-
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            error!("Whisper failed: {}", stderr);
-            return Err(anyhow::anyhow!("Whisper transcription failed: {}", stderr));
-        }
-
-        // Read the output file
-        let audio_stem = audio_path
-            .file_stem()
-            .context("Invalid audio path")?
-            .to_str()
-            .context("Invalid audio filename")?;
-
-        let output_path = PathBuf::from(format!("/tmp/{audio_stem}.txt"));
-        let transcription =
-            std::fs::read_to_string(&output_path).context("Failed to read transcription output")?;
-
-        // Clean up output file
-        let _ = std::fs::remove_file(&output_path);
-
-        let transcription = transcription.trim().to_string();
-        info!("Transcription complete: {} chars", transcription.len());
-
-        Ok(transcription)
+    pub fn is_openai_whisper(&self) -> bool {
+        self.provider.name() == "OpenAI Whisper CLI"
     }
+}
 
-    async fn transcribe_whisper_cpp(&self, audio_path: &PathBuf) -> Result<String> {
-        info!("Using whisper.cpp");
+#[derive(Debug, Clone)]
+pub struct ProviderConfig {
+    pub model: Option<String>,
+    pub model_path: Option<String>,
+    pub language: Option<String>,
+    pub command_path: Option<String>,
+    pub api_endpoint: Option<String>,
+    pub api_key: Option<String>,
+}
 
-        let model_arg = if let Some(model_path) = &self.model_path {
-            info!("Using custom model path: {}", model_path);
-            model_path.clone()
-        } else {
-            format!("models/ggml-{}.bin", self.model)
-        };
-
-        // For whisper.cpp, we'll capture stdout directly
-        let mut cmd = Command::new(&self.command_path);
-        cmd.arg("-f")
-            .arg(audio_path)
-            .arg("-m")
-            .arg(&model_arg)
-            .arg("-l")
-            .arg(&self.language)
-            .arg("-nt") // No timestamps
-            .arg("-np") // No progress
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .stdin(Stdio::null()); // Explicitly set stdin to null
-
-        let output = cmd
-            .output()
-            .context("Failed to execute whisper.cpp command")?;
-
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            error!("Whisper.cpp failed: {}", stderr);
-
-            // Fallback: try simpler command
-            let mut cmd = Command::new(&self.command_path);
-            cmd.arg("-f").arg(audio_path);
-
-            // Add model arg to fallback if we have a custom path
-            if let Some(model_path) = &self.model_path {
-                cmd.arg("-m").arg(model_path);
-            }
-
-            let output = cmd
-                .output()
-                .context("Failed to execute fallback whisper.cpp command")?;
-
-            if !output.status.success() {
-                return Err(anyhow::anyhow!("Whisper.cpp transcription failed"));
-            }
-
-            let transcription = String::from_utf8_lossy(&output.stdout);
-            return Ok(transcription.trim().to_string());
+impl Default for ProviderConfig {
+    fn default() -> Self {
+        Self {
+            model: None,
+            model_path: None,
+            language: Some("en".to_string()),
+            command_path: None,
+            api_endpoint: None,
+            api_key: None,
         }
-
-        let transcription = String::from_utf8_lossy(&output.stdout);
-        let transcription = transcription.trim().to_string();
-
-        info!("Transcription complete: {} chars", transcription.len());
-
-        Ok(transcription)
     }
 }

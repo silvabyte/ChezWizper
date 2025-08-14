@@ -1,0 +1,44 @@
+[audio]
+device = "default"
+sample_rate = 16000
+channels = 1
+
+[whisper]
+# Auto-detection (recommended) - will use the best available provider:
+# 1. OpenAI Whisper CLI (if installed) 
+# 2. whisper.cpp (fallback)
+# Note: API providers need explicit configuration with api_key
+model = "base"
+language = "en"
+
+# Explicit provider examples (uncomment to override auto-detection):
+# provider = "openai-api"     # OpenAI API provider
+# api_key = "sk-your-key"     # Your OpenAI API key (required for API)
+# model = "whisper-1"         # For OpenAI API
+# api_endpoint = "https://api.openai.com/v1/audio/transcriptions"  # Optional
+
+# provider = "openai-cli"     # Local OpenAI Whisper CLI
+# model = "base"              # tiny, base, small, medium, large-v3
+# command_path = "/path/to/whisper"  # Optional custom path
+
+# provider = "whisper-cpp"    # Local whisper.cpp (experimental)
+# model = "base"
+# command_path = "/path/to/whisper"     # Optional custom path  
+# model_path = "/path/to/model.bin"     # Optional custom model
+
+[ui]
+indicator_position = "top-right"
+indicator_size = 20
+show_notifications = true
+layer_shell_anchor = "top | right"
+layer_shell_margin = 10
+
+[wayland]
+input_method = "wtype"
+use_hyprland_ipc = true
+
+[behavior]
+auto_paste = true
+preserve_clipboard = false
+delete_audio_files = true
+audio_feedback = true

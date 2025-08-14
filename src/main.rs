@@ -57,18 +57,39 @@ async fn main() -> Result<()> {
     info!("Starting ChezWizper");
 
     // Load configuration
-    let config = Config::load()?;
-
+    let config = if let Some(config_path) = args.config {
+        Config::load_from_path(config_path)?
+    } else {
+        Config::load()?
+    };
     // Initialize components
     let (tx, mut rx) = mpsc::channel::<ApiCommand>(10);
 
     let audio_recorder = AudioStreamManager::new()?;
 
     // Build whisper transcriber
-    let whisper = WhisperTranscriber::new(config.whisper.command_path.clone())?
-        .with_model(config.whisper.model.clone())
-        .with_model_path(config.whisper.model_path.clone())
-        .with_language(config.whisper.language.clone());
+    let whisper = if let Some(provider) = &config.whisper.provider {
+        let provider_config = whisper::ProviderConfig {
+            model: Some(config.whisper.model.clone()),
+            model_path: config.whisper.model_path.clone(),
+            language: Some(config.whisper.language.clone()),
+            command_path: config.whisper.command_path.clone(),
+            api_endpoint: config.whisper.api_endpoint.clone(),
+            api_key: config.whisper.api_key.clone(),
+        };
+        WhisperTranscriber::with_provider(provider, provider_config)?
+    } else {
+        // Auto-detect provider when no provider specified
+        let provider_config = whisper::ProviderConfig {
+            model: Some(config.whisper.model.clone()),
+            model_path: config.whisper.model_path.clone(),
+            language: Some(config.whisper.language.clone()),
+            command_path: config.whisper.command_path.clone(),
+            api_endpoint: config.whisper.api_endpoint.clone(),
+            api_key: config.whisper.api_key.clone(),
+        };
+        WhisperTranscriber::auto_detect(provider_config)?
+    };
 
     // Compose transcription service with whisper and normalizer
     let transcription_service = TranscriptionService::new(whisper)?;

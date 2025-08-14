@@ -34,7 +34,7 @@ For other distributions or custom setups, see the [Installation Guide](./docs/in
 
 ## Configuration
 
-Default config at `~/.config/chezwizper/config.toml`. See [Configuration Guide](./docs/audio-configuration.md) for details.
+Default config at `~/.config/chezwizper/config.toml`. See [Configuration Guide](./docs/configuration.md) for details.
 
 ## Development
 
@@ -57,7 +57,7 @@ make clean      # Clean build artifacts
 
 ## Troubleshooting
 
-- **Recording issues**: Check [Audio Configuration](./docs/audio-configuration.md)
+- **Recording issues**: Check [Configuration Guide](./docs/configuration.md)
 - **Text injection fails**: See [Text Injection Setup](./docs/text-injection-setup.md)
 - **Service problems**: View logs with `make logs`
 

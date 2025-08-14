@@ -6,6 +6,12 @@ pub struct Indicator {
     audio_feedback_enabled: bool,
 }
 
+impl Default for Indicator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Indicator {
     pub fn new() -> Self {
         Self {
