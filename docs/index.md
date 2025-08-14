@@ -8,6 +8,7 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 
 - [Installation Guide](./installation.md) - Complete installation instructions for all platforms
 - [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
+- [Whisper Transcription Setup](./whisper-transcription-setup.md) - Configure speech-to-text providers (OpenAI API, local Whisper)
 
 ### Configuration Guides
 
@@ -31,7 +32,6 @@ make status     # Check service status
 
 ### Coming Soon
 
-- Whisper Models Guide - Choosing and configuring different Whisper models
 - Keyboard Shortcuts - Setting up custom keybindings
 - Troubleshooting Guide - Common issues and solutions
 - API Reference - HTTP API endpoints and usage

@@ -11,29 +11,52 @@ This fork adds OpenAI Whisper API support to ChezWizper, allowing you to use Ope
 
 ## Configuration
 
-### API Mode (Recommended)
+### Provider-Based Configuration (Recommended)
 
-Create a config file with `use_api = true`:
+The new provider-based configuration allows for more flexibility and easier addition of new transcription services:
 
 ```toml
 [whisper]
-model = "whisper-1"          # OpenAI API model
-language = "en"              # Language code (optional)
-use_api = true               # Enable API mode
-api_endpoint = "https://api.openai.com/v1/audio/transcriptions"  # Optional custom endpoint
+provider = "openai-api"      # Explicitly specify the provider
+model = "whisper-1"          # Model name (provider-specific)
+language = "en"              # Language code
 
-# Set OPENAI_API_KEY environment variable
+# Optional settings
+api_endpoint = "https://api.openai.com/v1/audio/transcriptions"  # Custom API endpoint
 ```
 
-### CLI Mode (Legacy)
+Available providers:
+- `openai-api` - OpenAI Whisper API (requires OPENAI_API_KEY)
+- `openai-cli` - OpenAI Whisper CLI tool
+- `whisper-cpp` - whisper.cpp implementation
+- Leave empty for auto-detection
 
+### Auto-Detection
+
+If no provider is specified, ChezWizper will auto-detect the best available provider:
+1. OpenAI API (if `OPENAI_API_KEY` is set)
+2. OpenAI Whisper CLI (if available) 
+3. whisper.cpp (fallback)
+
+### Provider Details
+
+#### OpenAI Whisper CLI
 ```toml
 [whisper]
-model = "base"               # Local model
+provider = "openai-cli"
+model = "base"
 language = "en"
-use_api = false              # Use local CLI
 # command_path = "/path/to/whisper"  # Optional custom path
-# model_path = "/path/to/model.bin"  # Optional custom model
+```
+
+#### whisper.cpp
+```toml
+[whisper]
+provider = "whisper-cpp"
+model = "base"
+language = "en"
+# command_path = "/path/to/whisper"  # Optional custom path
+# model_path = "/path/to/model.bin"  # Optional custom model path
 ```
 
 ## Setup

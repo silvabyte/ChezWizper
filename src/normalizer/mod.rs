@@ -64,6 +64,12 @@ impl TranscriptionNormalizer for WhisperCppNormalizer {
 /// Normalizer for OpenAI Whisper output format
 pub struct OpenAIWhisperNormalizer;
 
+impl Default for OpenAIWhisperNormalizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OpenAIWhisperNormalizer {
     pub fn new() -> Self {
         Self

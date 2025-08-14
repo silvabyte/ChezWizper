@@ -14,7 +14,7 @@ pub struct TranscriptionService {
 impl TranscriptionService {
     /// Create a new transcription service with the provided whisper transcriber
     pub fn new(whisper: WhisperTranscriber) -> Result<Self> {
-        let normalizer = Normalizer::create(whisper.is_openai_whisper)?;
+        let normalizer = Normalizer::create(whisper.is_openai_whisper())?;
 
         Ok(Self {
             whisper,

@@ -68,14 +68,26 @@ async fn main() -> Result<()> {
     let audio_recorder = AudioStreamManager::new()?;
 
     // Build whisper transcriber
-    let whisper = WhisperTranscriber::new(
-        config.whisper.command_path.clone(),
-        config.whisper.use_api,
-        config.whisper.api_endpoint.clone()
-    )?
-        .with_model(config.whisper.model.clone())
-        .with_model_path(config.whisper.model_path.clone())
-        .with_language(config.whisper.language.clone());
+    let whisper = if let Some(provider) = &config.whisper.provider {
+        let provider_config = whisper::ProviderConfig {
+            model: Some(config.whisper.model.clone()),
+            model_path: config.whisper.model_path.clone(),
+            language: Some(config.whisper.language.clone()),
+            command_path: config.whisper.command_path.clone(),
+            api_endpoint: config.whisper.api_endpoint.clone(),
+        };
+        WhisperTranscriber::with_provider(provider, provider_config)?
+    } else {
+        // Auto-detect provider when no provider specified
+        let provider_config = whisper::ProviderConfig {
+            model: Some(config.whisper.model.clone()),
+            model_path: config.whisper.model_path.clone(),
+            language: Some(config.whisper.language.clone()),
+            command_path: config.whisper.command_path.clone(),
+            api_endpoint: config.whisper.api_endpoint.clone(),
+        };
+        WhisperTranscriber::auto_detect(provider_config)?
+    };
 
     // Compose transcription service with whisper and normalizer
     let transcription_service = TranscriptionService::new(whisper)?;
