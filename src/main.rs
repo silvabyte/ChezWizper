@@ -118,7 +118,7 @@ async fn main() -> Result<()> {
     // Print instructions for Hyprland setup
     info!("ChezWizper is ready!");
     info!("Add this to your Hyprland config:");
-    info!("bind = CTRL SHIFT, R, exec, -e curl -X POST http://127.0.0.1:3737/toggle");
+    info!("bindd = SUPER, R, ChezWizper, exec, curl -X POST http://127.0.0.1:3737/toggle");
     info!("Or test manually: curl -X POST http://127.0.0.1:3737/toggle");
 
     // Main event loop

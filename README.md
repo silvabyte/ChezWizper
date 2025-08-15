@@ -16,7 +16,7 @@ This automatically installs dependencies, builds ChezWizper with optimized Whisp
 
 **After installation:**
 1. Start the service: `make start`
-2. Add to Hyprland config: `bind = SUPER, R, exec, curl -X POST http://127.0.0.1:3737/toggle`
+2. Add to Hyprland config: `bindd = SUPER, R, ChezWizper, exec, curl -X POST http://127.0.0.1:3737/toggle`
 3. Press Super+R to start recording!
 
 ## Features

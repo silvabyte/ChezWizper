@@ -361,9 +361,9 @@ printf "1. Start ChezWizper service:\n"
 printf "   ${GREEN}make start${NC}\n"
 echo
 printf "2. Add this keybind to your Hyprland config (~/.config/hypr/hyprland.conf):\n"
-printf "   ${GREEN}bind = SUPER, R, exec, curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
+printf "   ${GREEN}bindd = SUPER, R, ChezWizper, exec, curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
 printf "   or for Omachy:\n"
-printf "   ${GREEN}bind = SUPER, R, exec, \$terminal -e curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
+printf "   ${GREEN}bindd = SUPER, R, ChezWizper, exec, \$terminal -e curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
 echo
 printf "3. Check service status:\n"
 printf "   ${GREEN}make status${NC}\n"
