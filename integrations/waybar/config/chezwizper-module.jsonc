@@ -1,0 +1,12 @@
+{
+  // Add this module to your waybar config.jsonc
+  // Place in modules-center, modules-left, or modules-right as desired
+  
+  "custom/chezwizper": {
+    "exec": "~/.config/waybar/scripts/chezwizper-status.sh",
+    "interval": 1,
+    "format": "{}",
+    "return-type": "json",
+    "on-click": "bash -c 'if [ \"$(cat /tmp/chezwizper_waybar_state 2>/dev/null)\" = \"complete\" ]; then ~/.config/waybar/scripts/chezwizper-copy-last.sh; else curl -X POST http://127.0.0.1:3737/toggle; fi'"
+  }
+}

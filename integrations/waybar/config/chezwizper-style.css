@@ -1,0 +1,66 @@
+/* ChezWizper voice transcription indicator styles */
+/* Add these styles to your waybar style.css */
+
+#custom-chezwizper {
+  padding: 0 8px;
+  margin: 0 4px;
+}
+
+#custom-chezwizper.chezwizper-recording {
+  color: #ff3333;
+  background-color: rgba(255, 51, 51, 0.2);
+  animation: recording-pulse 1s ease-in-out infinite;
+}
+
+#custom-chezwizper.chezwizper-processing {
+  color: #ffaa33;
+  background-color: rgba(255, 170, 51, 0.2);
+  animation: processing-spin 1s linear infinite;
+}
+
+#custom-chezwizper.chezwizper-complete {
+  color: #33ff33;
+  background-color: rgba(51, 255, 51, 0.15);
+  animation: complete-fade 10s ease-out;
+}
+
+#custom-chezwizper.chezwizper-complete:hover {
+  background-color: rgba(51, 255, 51, 0.25);
+}
+
+#custom-chezwizper.chezwizper-idle,
+#custom-chezwizper.chezwizper-offline {
+  /* Hidden when idle or offline */
+  padding: 0;
+  margin: 0;
+}
+
+@keyframes recording-pulse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes processing-spin {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes complete-fade {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
