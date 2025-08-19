@@ -32,6 +32,7 @@ indicator_size = 20
 show_notifications = true
 layer_shell_anchor = "top | right"
 layer_shell_margin = 10
+notification_color = "rgb(ff1744)"  # Hyprland notification color
 
 [ui.waybar]
 idle_text = "󰑊"                # Icon shown when idle (ready to record) - Nerd Font

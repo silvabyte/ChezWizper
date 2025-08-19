@@ -1,9 +1,11 @@
+use crate::config::UiConfig;
 use anyhow::Result;
 use std::process::Command;
 use tracing::{debug, info, warn};
 
 pub struct Indicator {
     audio_feedback_enabled: bool,
+    notification_color: String,
 }
 
 impl Default for Indicator {
@@ -16,6 +18,14 @@ impl Indicator {
     pub fn new() -> Self {
         Self {
             audio_feedback_enabled: true,
+            notification_color: "rgb(ff1744)".to_string(),
+        }
+    }
+
+    pub fn from_config(config: &UiConfig) -> Self {
+        Self {
+            audio_feedback_enabled: true,
+            notification_color: config.notification_color.clone(),
         }
     }
 
@@ -81,7 +91,7 @@ impl Indicator {
 
     fn hyprland_notify(&self, title: &str) -> Result<()> {
         Command::new("hyprctl")
-            .args(["notify", "-1", "3000", "rgb(ff1744)", title])
+            .args(["notify", "-1", "3000", &self.notification_color, title])
             .output()?;
 
         Ok(())

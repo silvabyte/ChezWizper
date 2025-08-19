@@ -41,6 +41,7 @@ pub struct UiConfig {
     pub show_notifications: bool,
     pub layer_shell_anchor: String,
     pub layer_shell_margin: u32,
+    pub notification_color: String,
     pub waybar: WaybarConfig,
 }
 
@@ -108,6 +109,7 @@ impl Default for UiConfig {
             show_notifications: true,
             layer_shell_anchor: "top | right".to_string(),
             layer_shell_margin: 10,
+            notification_color: "rgb(ff1744)".to_string(),
             waybar: WaybarConfig::default(),
         }
     }
