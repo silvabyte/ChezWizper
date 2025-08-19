@@ -6,12 +6,13 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use std::collections::HashMap;
 use serde_json::{json, Value};
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use tower::ServiceBuilder;
 use tracing::{error, info};
+use crate::config::{Config, WaybarConfig};
 
 #[derive(Clone)]
 pub enum ApiCommand {
@@ -22,6 +23,7 @@ pub enum ApiCommand {
 pub struct AppState {
     tx: mpsc::Sender<ApiCommand>,
     recording: Arc<Mutex<bool>>,
+    waybar_config: WaybarConfig,
 }
 
 pub struct ApiServer {
@@ -30,10 +32,14 @@ pub struct ApiServer {
 }
 
 impl ApiServer {
-    pub fn new(tx: mpsc::Sender<ApiCommand>, recording: Arc<Mutex<bool>>) -> Self {
+    pub fn new(tx: mpsc::Sender<ApiCommand>, recording: Arc<Mutex<bool>>, config: &Config) -> Self {
         Self {
             port: 3737, // WHSP in numbers
-            state: AppState { tx, recording },
+            state: AppState { 
+                tx, 
+                recording,
+                waybar_config: config.ui.waybar.clone(),
+            },
         }
     }
 
@@ -87,12 +93,12 @@ async fn recording_status(
     State(state): State<AppState>,
 ) -> Json<Value> {
     let recording = *state.recording.lock().await;
-    
+
     // Check if waybar style is requested
     if params.get("style") == Some(&"waybar".to_string()) {
-        return Json(generate_waybar_response(recording));
+        return Json(generate_waybar_response(recording, &state.waybar_config));
     }
-    
+
     // Default JSON response
     Json(json!({
         "recording": recording,
@@ -100,19 +106,14 @@ async fn recording_status(
     }))
 }
 
-fn generate_waybar_response(recording: bool) -> Value {
+fn generate_waybar_response(recording: bool, config: &WaybarConfig) -> Value {
     json!({
-        "text": if recording { "🔴 REC" } else { "" },
+        "text": if recording { &config.recording_text } else { &config.idle_text },
         "class": if recording { "chezwizper-recording" } else { "chezwizper-idle" },
-        "tooltip": if recording { 
-            "Recording... Press Super+R to stop" 
-        } else { 
-            "Press Super+R to record" 
-        },
-        "style": if recording {
-            "color: #f7768e; background-color: rgba(247, 118, 142, 0.2); animation: recording-pulse 1s ease-in-out infinite;"
+        "tooltip": if recording {
+            &config.recording_tooltip
         } else {
-            "padding: 0; margin: 0;"
+            &config.idle_tooltip
         }
     })
 }
