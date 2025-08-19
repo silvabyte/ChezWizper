@@ -1,6 +1,6 @@
 [Unit]
 Description=ChezWizper Voice Transcription Service
-Documentation=https://github.com/matsilva/whispy
+Documentation=https://github.com/silvabyte/ChezWizper
 After=graphical-session.target
 
 [Service]
