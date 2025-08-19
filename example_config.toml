@@ -33,6 +33,14 @@ show_notifications = true
 layer_shell_anchor = "top | right"
 layer_shell_margin = 10
 
+[ui.waybar]
+idle_text = "󰑊"                # Icon shown when idle (ready to record) - Nerd Font
+recording_text = "󰻃"           # Icon shown when recording - Nerd Font
+processing_text = "󰦖"          # Icon shown when processing - Nerd Font
+idle_tooltip = "Press Super+R to record"
+recording_tooltip = "Recording... Press Super+R to stop"
+processing_tooltip = "Processing transcription..."
+
 [wayland]
 input_method = "wtype"
 use_hyprland_ipc = true
