@@ -1,11 +1,12 @@
 use anyhow::Result;
 use axum::{
-    extract::State,
+    extract::{Query, State},
     http::StatusCode,
     response::Json,
     routing::{get, post},
     Router,
 };
+use std::collections::HashMap;
 use serde_json::{json, Value};
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
@@ -81,10 +82,37 @@ async fn toggle_recording(State(state): State<AppState>) -> Result<Json<Value>, 
     }
 }
 
-async fn recording_status(State(state): State<AppState>) -> Json<Value> {
+async fn recording_status(
+    Query(params): Query<HashMap<String, String>>,
+    State(state): State<AppState>,
+) -> Json<Value> {
     let recording = *state.recording.lock().await;
+    
+    // Check if waybar style is requested
+    if params.get("style") == Some(&"waybar".to_string()) {
+        return Json(generate_waybar_response(recording));
+    }
+    
+    // Default JSON response
     Json(json!({
         "recording": recording,
         "status": if recording { "recording" } else { "idle" }
     }))
+}
+
+fn generate_waybar_response(recording: bool) -> Value {
+    json!({
+        "text": if recording { "🔴 REC" } else { "" },
+        "class": if recording { "chezwizper-recording" } else { "chezwizper-idle" },
+        "tooltip": if recording { 
+            "Recording... Press Super+R to stop" 
+        } else { 
+            "Press Super+R to record" 
+        },
+        "style": if recording {
+            "color: #f7768e; background-color: rgba(247, 118, 142, 0.2); animation: recording-pulse 1s ease-in-out infinite;"
+        } else {
+            "padding: 0; margin: 0;"
+        }
+    })
 }

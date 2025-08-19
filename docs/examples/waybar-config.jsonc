@@ -1,0 +1,60 @@
+{
+  "modules-left": [
+    "hyprland/workspaces"
+  ],
+  "modules-center": [
+    "custom/chezwizper",
+    "clock"
+  ],
+  "modules-right": [
+    "tray",
+    "pulseaudio",
+    "network",
+    "battery"
+  ],
+
+  "custom/chezwizper": {
+    "exec": "curl -s 'http://127.0.0.1:3737/status?style=waybar'",
+    "interval": 1,
+    "return-type": "json",
+    "on-click": "curl -X POST http://127.0.0.1:3737/toggle",
+    "tooltip": true,
+    "max-length": 15
+  },
+
+  "clock": {
+    "format": "{:%Y-%m-%d %H:%M:%S}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "interval": 1
+  },
+
+  "pulseaudio": {
+    "format": "{volume}% {icon}",
+    "format-muted": "🔇",
+    "format-icons": {
+      "headphone": "🎧",
+      "hands-free": "🎧",
+      "headset": "🎧",
+      "phone": "📞",
+      "portable": "📱",
+      "car": "🚗",
+      "default": ["🔈", "🔉", "🔊"]
+    },
+    "on-click": "pavucontrol"
+  },
+
+  "network": {
+    "format-wifi": "{essid} ({signalStrength}%) 📶",
+    "format-ethernet": "Ethernet 🌐",
+    "format-disconnected": "Disconnected ❌"
+  },
+
+  "battery": {
+    "format": "{capacity}% {icon}",
+    "format-icons": ["🪫", "🔋"]
+  },
+
+  "tray": {
+    "spacing": 10
+  }
+}

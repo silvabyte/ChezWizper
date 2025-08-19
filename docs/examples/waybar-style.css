@@ -1,0 +1,23 @@
+/* ChezWizper Waybar Integration - Recording Animation */
+
+@keyframes recording-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+/* The recording class and style are applied automatically via the API */
+#custom-chezwizper.chezwizper-recording {
+  /* Animation is handled by inline style from API */
+}
+
+#custom-chezwizper.chezwizper-idle {
+  /* Hidden when idle */
+  padding: 0;
+  margin: 0;
+}
