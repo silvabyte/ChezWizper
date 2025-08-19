@@ -9,6 +9,7 @@ Welcome to the ChezWizper documentation. This directory contains detailed guides
 - [Installation Guide](./installation.md) - Complete installation instructions for all platforms
 - [Text Injection Setup](./text-injection-setup.md) - Set up automatic text injection methods for different environments
 - [**Configuration Guide**](./configuration.md) - Complete configuration reference covering all ChezWizper settings including providers, audio, UI, and behavior
+- [Waybar Integration](./waybar-integration.md) - Add ChezWizper status indicators to your Waybar
 
 ### Development
 

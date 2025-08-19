@@ -106,7 +106,7 @@ async fn main() -> Result<()> {
     };
 
     // Create and start API server
-    let api_server = ApiServer::new(tx, recording_flag.clone());
+    let api_server = ApiServer::new(tx, recording_flag.clone(), &config);
 
     // Start API server in background
     tokio::spawn(async move {
