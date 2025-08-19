@@ -27,7 +27,7 @@ impl Indicator {
     pub async fn show_recording(&self) -> Result<()> {
         info!("Showing recording indicator");
 
-        if let Err(e) = self.hyprland_notify("🔴 Recording...") {
+        if let Err(e) = self.hyprland_notify("󰻃 Recording...") {
             debug!("Hyprland notification failed: {}", e);
         }
 
@@ -40,7 +40,7 @@ impl Indicator {
     pub async fn show_processing(&self) -> Result<()> {
         info!("Showing processing indicator");
 
-        if let Err(e) = self.hyprland_notify("⏳Processing...") {
+        if let Err(e) = self.hyprland_notify("󰦖 Processing...") {
             debug!("Hyprland notification failed: {}", e);
         }
 
@@ -59,7 +59,7 @@ impl Indicator {
             text.to_string()
         };
 
-        if let Err(e) = self.hyprland_notify(&format!("✅ {preview}")) {
+        if let Err(e) = self.hyprland_notify(&format!("󰑊 {preview}")) {
             debug!("Hyprland notification failed: {}", e);
         }
 
