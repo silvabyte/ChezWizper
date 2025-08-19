@@ -44,6 +44,14 @@ show_notifications = true       # Show desktop notifications
 layer_shell_anchor = "top | right"  # Wayland layer shell anchor
 layer_shell_margin = 10         # Margin from screen edge in pixels
 
+[ui.waybar]
+idle_text = "󰑊"                # Icon shown when idle (ready to record)
+recording_text = "󰻃"           # Icon shown when recording
+processing_text = "󰦖"          # Icon shown when processing transcription
+idle_tooltip = "Press Super+R to record"                    # Tooltip for idle state
+recording_tooltip = "Recording... Press Super+R to stop"     # Tooltip for recording state
+processing_tooltip = "Processing transcription..."           # Tooltip for processing state
+
 [wayland]
 input_method = "wtype"          # Text injection method
 use_hyprland_ipc = true         # Use Hyprland IPC for better integration
@@ -141,6 +149,25 @@ Controls visual indicators and desktop notifications.
 | `show_notifications` | bool | `true` | Show desktop notifications for transcription results |
 | `layer_shell_anchor` | string | `"top \| right"` | Wayland layer shell anchor points |
 | `layer_shell_margin` | number | `10` | Distance from screen edge in pixels |
+
+#### [ui.waybar] - Waybar Integration
+
+Customize icons and tooltips for Waybar status display. See [Waybar Integration](./waybar-integration.md) for setup instructions.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `idle_text` | string | `"󰑊"` | Icon shown when idle (ready to record) - Nerd Font icon |
+| `recording_text` | string | `"󰻃"` | Icon shown when actively recording - Nerd Font icon |
+| `processing_text` | string | `"󰦖"` | Icon shown when processing transcription - Nerd Font icon |
+| `idle_tooltip` | string | `"Press Super+R to record"` | Tooltip text when hovering over idle state |
+| `recording_tooltip` | string | `"Recording... Press Super+R to stop"` | Tooltip text when hovering during recording |
+| `processing_tooltip` | string | `"Processing transcription..."` | Tooltip text when processing audio |
+
+**Icon Tips:**
+- Uses Nerd Font icons for consistency with other Waybar modules
+- Icons inherit colors from your Waybar theme via CSS classes
+- All styling is controlled by CSS, not inline styles
+- Custom icons can be any Unicode character or Nerd Font glyph
 
 ### [wayland] - Wayland Integration
 
