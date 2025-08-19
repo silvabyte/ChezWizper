@@ -116,9 +116,9 @@ impl Default for UiConfig {
 impl Default for WaybarConfig {
     fn default() -> Self {
         Self {
-            idle_text: "󰑊".to_string(),           // Nerd Font circle with dot (idle)
-            recording_text: "󰻃".to_string(),      // Nerd Font record button (recording)  
-            processing_text: "󰦖".to_string(),     // Nerd Font loading/processing icon
+            idle_text: "󰑊".to_string(),       // Nerd Font circle with dot (idle)
+            recording_text: "󰻃".to_string(),  // Nerd Font record button (recording)
+            processing_text: "󰦖".to_string(), // Nerd Font loading/processing icon
             idle_tooltip: "Press Super+R to record".to_string(),
             recording_tooltip: "Recording... Press Super+R to stop".to_string(),
             processing_tooltip: "Processing transcription...".to_string(),

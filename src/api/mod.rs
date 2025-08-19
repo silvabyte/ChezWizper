@@ -1,3 +1,4 @@
+use crate::config::{Config, WaybarConfig};
 use anyhow::Result;
 use axum::{
     extract::{Query, State},
@@ -12,7 +13,6 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use tower::ServiceBuilder;
 use tracing::{error, info};
-use crate::config::{Config, WaybarConfig};
 
 #[derive(Clone)]
 pub enum ApiCommand {
@@ -35,8 +35,8 @@ impl ApiServer {
     pub fn new(tx: mpsc::Sender<ApiCommand>, recording: Arc<Mutex<bool>>, config: &Config) -> Self {
         Self {
             port: 3737, // WHSP in numbers
-            state: AppState { 
-                tx, 
+            state: AppState {
+                tx,
                 recording,
                 waybar_config: config.ui.waybar.clone(),
             },
