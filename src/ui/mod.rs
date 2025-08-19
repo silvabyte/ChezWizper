@@ -69,7 +69,7 @@ impl Indicator {
             text.to_string()
         };
 
-        if let Err(e) = self.hyprland_notify(&format!("󰑊 {preview}")) {
+        if let Err(e) = self.hyprland_notify(&format!("󰸞 {preview}")) {
             debug!("Hyprland notification failed: {}", e);
         }
 
