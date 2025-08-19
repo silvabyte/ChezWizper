@@ -97,7 +97,8 @@ async fn main() -> Result<()> {
     let text_injector = TextInjector::new(Some(&config.wayland.input_method))?;
     let mut clipboard = ClipboardManager::new()?.with_preserve(config.behavior.preserve_clipboard);
 
-    let indicator = Indicator::new().with_audio_feedback(config.behavior.audio_feedback);
+    let indicator =
+        Indicator::from_config(&config.ui).with_audio_feedback(config.behavior.audio_feedback);
 
     let recording_flag = Arc::new(Mutex::new(false));
     let state = RecordingState {
