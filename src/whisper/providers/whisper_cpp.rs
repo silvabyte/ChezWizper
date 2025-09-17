@@ -32,7 +32,10 @@ impl WhisperCppProvider {
                 ));
             }
         } else {
-            which("whisper").context("Whisper CLI not found. Please install whisper.cpp")?
+            // Try to find whisper-cli first (as built by our install script), then whisper
+            which("whisper-cli")
+                .or_else(|_| which("whisper"))
+                .context("Whisper CLI not found. Please install whisper.cpp (whisper-cli or whisper command)")?
         };
 
         info!("Found whisper.cpp at: {:?}", command_path);

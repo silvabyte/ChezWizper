@@ -294,6 +294,7 @@ sample_rate = 16000
 channels = 1
 
 [whisper]
+provider = "whisper-cpp"
 model = "large-v3-turbo"
 language = "en"
 command_path = "$WHISPER_DIR/build/bin/whisper-cli"
