@@ -4,27 +4,27 @@ sample_rate = 16000
 channels = 1
 
 [whisper]
-# Auto-detection (recommended) - will use the best available provider:
-# 1. OpenAI Whisper CLI (if installed) 
-# 2. whisper.cpp (fallback)
-# Note: API providers need explicit configuration with api_key
-model = "base"
-language = "en"
+# Provider selection (defaults to auto-detection if not specified)
+# Uncomment and set provider to explicitly choose:
+# provider = "whisper-cpp"    # Local whisper.cpp (built during install)
+# provider = "openai-cli"     # Local OpenAI Whisper CLI 
+# provider = "openai-api"     # OpenAI API (requires api_key)
 
-# Explicit provider examples (uncomment to override auto-detection):
-# provider = "openai-api"     # OpenAI API provider
-# api_key = "sk-your-key"     # Your OpenAI API key (required for API)
-# model = "whisper-1"         # For OpenAI API
+# Common settings
+model = "base"              # Model size: tiny, base, small, medium, large-v3, large-v3-turbo
+language = "en"             # Language code (en, es, fr, de, etc.)
+
+# whisper.cpp settings (used when provider = "whisper-cpp")
+# command_path = "/path/to/whisper-cli"  # Optional custom path
+# model_path = "/path/to/model.bin"      # Optional custom model path
+
+# OpenAI CLI settings (used when provider = "openai-cli")
+# command_path = "/path/to/whisper"      # Optional custom path
+
+# OpenAI API settings (used when provider = "openai-api")
+# api_key = "sk-your-key"                # Required for API
+# model = "whisper-1"                    # API model name
 # api_endpoint = "https://api.openai.com/v1/audio/transcriptions"  # Optional
-
-# provider = "openai-cli"     # Local OpenAI Whisper CLI
-# model = "base"              # tiny, base, small, medium, large-v3
-# command_path = "/path/to/whisper"  # Optional custom path
-
-# provider = "whisper-cpp"    # Local whisper.cpp (experimental)
-# model = "base"
-# command_path = "/path/to/whisper"     # Optional custom path  
-# model_path = "/path/to/model.bin"     # Optional custom model
 
 [ui]
 indicator_position = "top-right"
