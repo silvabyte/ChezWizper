@@ -363,7 +363,7 @@ printf "   ${GREEN}make start${NC}\n"
 echo
 printf "2. Add this keybind to your Hyprland config (~/.config/hypr/hyprland.conf):\n"
 printf "   ${GREEN}bindd = SUPER, R, ChezWizper, exec, curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
-printf "   or for Omachy:\n"
+printf "   or for Omarchy:\n"
 printf "   ${GREEN}bindd = SUPER, R, ChezWizper, exec, \$terminal -e curl -X POST http://127.0.0.1:3737/toggle${NC}\n"
 echo
 printf "3. Check service status:\n"
