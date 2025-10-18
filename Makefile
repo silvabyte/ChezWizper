@@ -1,26 +1,27 @@
-.PHONY: help build release check test clean install run logs start restart stop status lint fmt fix
+.PHONY: help build release check test clean install uninstall run logs start restart stop status lint fmt fix
 
 # Default target
 help:
 	@echo "🦀 ChezWizper Development Commands"
 	@echo ""
-	@echo "  make build    - Build debug binary"
-	@echo "  make release  - Build optimized release binary"
-	@echo "  make check    - Run cargo check"
-	@echo "  make test     - Run tests"
-	@echo "  make lint     - Run clippy linter"
-	@echo "  make fmt      - Check formatting"
-	@echo "  make fix      - Fix formatting and simple lint issues"
+	@echo "  make build     - Build debug binary"
+	@echo "  make release   - Build optimized release binary"
+	@echo "  make check     - Run cargo check"
+	@echo "  make test      - Run tests"
+	@echo "  make lint      - Run clippy linter"
+	@echo "  make fmt       - Check formatting"
+	@echo "  make fix       - Fix formatting and simple lint issues"
 	@echo ""
-	@echo "  make install  - Install ChezWizper (Arch Linux)"
-	@echo "  make run      - Run ChezWizper directly"
-	@echo "  make start    - Enable and start service"
-	@echo "  make logs     - Show service logs"
-	@echo "  make restart  - Restart service"
-	@echo "  make stop     - Stop service"
-	@echo "  make status   - Check service status"
+	@echo "  make install   - Install ChezWizper (Arch Linux)"
+	@echo "  make uninstall - Uninstall ChezWizper"
+	@echo "  make run       - Run ChezWizper directly"
+	@echo "  make start     - Enable and start service"
+	@echo "  make logs      - Show service logs"
+	@echo "  make restart   - Restart service"
+	@echo "  make stop      - Stop service"
+	@echo "  make status    - Check service status"
 	@echo ""
-	@echo "  make clean    - Clean build artifacts"
+	@echo "  make clean     - Clean build artifacts"
 
 # Build commands
 build:
@@ -49,6 +50,9 @@ fix:
 # Installation and service management
 install:
 	./scripts/install.sh
+
+uninstall:
+	./scripts/uninstall.sh
 
 run:
 	RUST_LOG=info cargo run --release
